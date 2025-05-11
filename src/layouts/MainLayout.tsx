@@ -25,7 +25,7 @@ interface MainHeaderProps {
   toggleSidebar: () => void;
   isSidebarCollapsed: boolean;
   onLogout: () => void;
-  user: User | null;
+  user: unknown | null;
 }
 
 export function MainHeader({ 

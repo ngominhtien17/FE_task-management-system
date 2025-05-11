@@ -1,160 +1,121 @@
-// src/layouts/components/MainSidebar.tsx
-import { useState, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+// src/layouts/components/MainHeader.tsx
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
-import {
-  Home,
-  Users,
-  FolderTree,
-  CheckSquare,
-  BarChart3,
-  Settings,
-  HelpCircle,
-  User,
-  Package,
-  Layers
+import { Input } from "@/components/ui/input";
+import { 
+  Bell, 
+  Menu, 
+  ChevronLeft, 
+  Search,
+  User as UserIcon,
+  LogOut
 } from "lucide-react";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
-interface NavItemProps {
-  icon: React.ReactNode;
-  label: string;
-  href: string;
-  isCollapsed: boolean;
-  isActive?: boolean;
+
+interface MainHeaderProps {
+  toggleSidebar: () => void;
+  isSidebarCollapsed: boolean;
+  onLogout: () => void;
+  user: User | null;
 }
 
-const NavItem = ({ icon, label, href, isCollapsed, isActive }: NavItemProps) => {
-  if (isCollapsed) {
-    return (
-      <TooltipProvider delayDuration={0}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <NavLink
-              to={href}
-              className={({ isActive }) =>
-                cn(
-                  "flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-accent hover:text-accent-foreground",
-                  isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"
-                )
-              }
-            >
-              {icon}
-              <span className="sr-only">{label}</span>
-            </NavLink>
-          </TooltipTrigger>
-          <TooltipContent side="right" className="font-medium">
-            {label}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  }
+export function MainHeader({ 
+  toggleSidebar, 
+  isSidebarCollapsed, 
+  onLogout,
+  user
+}: MainHeaderProps) {
+  const navigate = useNavigate();
+
+  const getInitials = (name: string) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
 
   return (
-    <NavLink
-      to={href}
-      className={({ isActive }) =>
-        cn(
-          "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
-          isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"
-        )
-      }
-    >
-      {icon}
-      <span>{label}</span>
-    </NavLink>
-  );
-};
-
-interface MainSidebarProps {
-  isCollapsed: boolean;
-  setIsCollapsed: (collapsed: boolean) => void;
-  isMobile: boolean;
-}
-
-export function MainSidebar({ isCollapsed, setIsCollapsed, isMobile }: MainSidebarProps) {
-  const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
-
-  // Handle mobile menu states
-  useEffect(() => {
-    setIsOpen(!isMobile);
-  }, [isMobile]);
-
-  // Close the mobile sheet when route changes
-  useEffect(() => {
-    if (isMobile) {
-      setIsOpen(false);
-    }
-  }, [location.pathname, isMobile]);
-
-  const navigationItems = [
-    { icon: <Home size={20} />, label: "Trang chính", href: "/dashboard" },
-    { icon: <Users size={20} />, label: "Quản lý người dùng", href: "/users" },
-    { icon: <FolderTree size={20} />, label: "Cấu trúc tổ chức", href: "/organization" },
-    { icon: <CheckSquare size={20} />, label: "Quản lý công việc", href: "/tasks" },
-    { icon: <User size={20} />, label: "Quản lý nhóm", href: "/groups" },
-    { icon: <Package size={20} />, label: "Quản lý tài nguyên", href: "/resources" },
-    { icon: <BarChart3 size={20} />, label: "Báo cáo thống kê", href: "/reports" },
-    { icon: <Settings size={20} />, label: "Cài đặt", href: "/settings" },
-    { icon: <HelpCircle size={20} />, label: "Trợ giúp", href: "/help" },
-  ];
-
-  const sidebarContent = (
-    <div className={cn("flex h-full flex-col gap-2", isCollapsed ? "items-center" : "")}>
-      <div className={cn("flex h-16 items-center", isCollapsed ? "justify-center" : "px-4")}>
-        {!isCollapsed && (
-          <NavLink to="/" className="flex items-center gap-2">
-            <Layers className="h-6 w-6 text-primary" />
-            <span className="text-lg font-semibold">Task System</span>
-          </NavLink>
-        )}
-        {isCollapsed && (
-          <Layers className="h-6 w-6 text-primary" />
-        )}
+    <header className="fixed top-0 left-0 right-0 h-16 bg-background border-b z-40 flex items-center px-4">
+      <div className="flex items-center">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={toggleSidebar} 
+          className="mr-2"
+          aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {isSidebarCollapsed ? <Menu /> : <ChevronLeft />}
+        </Button>
+        
+        <div className="text-xl font-semibold flex items-center gap-2">
+          <span className="text-primary">Hệ thống quản lý công việc</span>
+        </div>
       </div>
       
-      <ScrollArea className="flex-1 px-2">
-        <div className={cn("flex flex-col gap-1", isCollapsed ? "items-center" : "")}>
-          {navigationItems.map((item, index) => (
-            <NavItem
-              key={index}
-              icon={item.icon}
-              label={item.label}
-              href={item.href}
-              isCollapsed={isCollapsed}
-              isActive={location.pathname === item.href}
-            />
-          ))}
+      <div className="flex-1 max-w-md mx-auto">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input 
+            type="search" 
+            placeholder="Tìm kiếm..." 
+            className="w-full pl-8 bg-muted/40"
+          />
         </div>
-      </ScrollArea>
-    </div>
-  );
-
-  // For mobile: use Sheet component
-  if (isMobile) {
-    return (
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent side="left" className="w-60 p-0">
-          {sidebarContent}
-        </SheetContent>
-      </Sheet>
-    );
-  }
-
-  // For desktop: render the sidebar directly
-  return (
-    <aside
-      className={cn(
-        "fixed left-0 top-16 z-30 h-[calc(100vh-64px)] border-r bg-background transition-all duration-300 ease-in-out",
-        isCollapsed ? "w-16" : "w-60"
-      )}
-    >
-      {sidebarContent}
-    </aside>
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell className="h-5 w-5" />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full"></span>
+        </Button>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+              <Avatar className="h-8 w-8">
+                <AvatarImage 
+                  src={user?.customSettings?.profileImage || ""} 
+                  alt={user?.fullName || "User"} 
+                />
+                <AvatarFallback>{user ? getInitials(user.fullName) : "U"}</AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56" align="end" forceMount>
+            <div className="flex flex-col space-y-1 p-2">
+              <p className="text-sm font-medium leading-none">{user?.fullName || "Người dùng"}</p>
+              <p className="text-xs leading-none text-muted-foreground">{user?.email || ""}</p>
+            </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              className="cursor-pointer"
+              onClick={() => navigate('/profile')}
+            >
+              <UserIcon className="mr-2 h-4 w-4" />
+              <span>Tài khoản</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="cursor-pointer text-destructive focus:text-destructive"
+              onClick={onLogout}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Đăng xuất</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
   );
 }
