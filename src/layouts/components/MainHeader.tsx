@@ -17,9 +17,21 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
+// Định nghĩa kiểu dữ liệu cho user
+interface User {
+  id?: string;
+  fullName?: string;
+  email?: string;
+  role?: string;
+  avatar?: string;
+  customSettings?: {
+    profileImage?: string;
+    theme?: string;
+    language?: string;
+  };
+}
 
 interface MainHeaderProps {
   toggleSidebar: () => void;
@@ -36,7 +48,7 @@ export function MainHeader({
 }: MainHeaderProps) {
   const navigate = useNavigate();
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string = "") => {
     if (!name) return 'U';
     return name
       .split(' ')
@@ -54,7 +66,7 @@ export function MainHeader({
           size="icon" 
           onClick={toggleSidebar} 
           className="mr-2"
-          aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={isSidebarCollapsed ? "Mở rộng thanh bên" : "Thu gọn thanh bên"}
         >
           {isSidebarCollapsed ? <Menu /> : <ChevronLeft />}
         </Button>
@@ -86,7 +98,7 @@ export function MainHeader({
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
                 <AvatarImage 
-                  src={user?.customSettings?.profileImage || ""} 
+                  src={user?.customSettings?.profileImage} 
                   alt={user?.fullName || "User"} 
                 />
                 <AvatarFallback>{user ? getInitials(user.fullName) : "U"}</AvatarFallback>

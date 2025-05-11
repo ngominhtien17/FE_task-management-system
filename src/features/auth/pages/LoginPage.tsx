@@ -6,21 +6,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { login } from "@/features/auth/redux/authSlice";
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const { isLoading, error } = useAppSelector((state) => state.auth);
   
+  // UI state only
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false,
   });
+  
+  // Giả lập loading và error để demo UI
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
+  // Handler functions for UI interactions
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -32,22 +34,22 @@ export function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    try {
-      const resultAction = await dispatch(
-        login({
-          email: formData.email,
-          password: formData.password,
-          rememberMe: formData.rememberMe,
-        })
-      );
-      
-      if (login.fulfilled.match(resultAction)) {
+    
+    // Giả lập quá trình đăng nhập
+    setIsLoading(true);
+    setError(null);
+    
+    // Giả lập thời gian xử lý
+    setTimeout(() => {
+      if (formData.email === "demo@example.com" && formData.password === "password") {
+        // Giả lập đăng nhập thành công
         navigate("/dashboard");
+      } else {
+        // Giả lập đăng nhập thất bại
+        setError("Email hoặc mật khẩu không chính xác");
       }
-    } catch (err) {
-      console.error('Login failed:', err);
-    }
+      setIsLoading(false);
+    }, 1500);
   };
 
   return (
