@@ -2,7 +2,7 @@
 import type { RouteObject } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
-import { MainLayout } from "@/layouts/main-layout";
+import { MainLayout } from "@/layouts/MainLayout";
 import { ProtectedRoute } from "./protected-route";
 import { Skeleton } from "@/components/ui/skeleton";
 

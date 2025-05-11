@@ -1,4 +1,4 @@
-// pages/auth/login.tsx
+// src/features/auth/pages/LoginPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, KeyRound, LockIcon, AlertCircle, User } from "lucide-react";
@@ -6,15 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAuth } from "@/contexts/auth-context";
-
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { login } from "@/features/auth/redux/authSlice";
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { login, error: authError } = useAuth();
+  const dispatch = useAppDispatch();
+  const { isLoading, error } = useAppSelector((state) => state.auth);
   
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -25,7 +24,6 @@ export function LoginPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError(null);
   };
 
   const handleCheckboxChange = (checked: boolean) => {
@@ -34,21 +32,23 @@ export function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
 
     try {
-      await login(formData.email, formData.password, formData.rememberMe);
-      navigate("/dashboard");
+      const resultAction = await dispatch(
+        login({
+          email: formData.email,
+          password: formData.password,
+          rememberMe: formData.rememberMe,
+        })
+      );
+      
+      if (login.fulfilled.match(resultAction)) {
+        navigate("/dashboard");
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Đã xảy ra lỗi khi đăng nhập");
-    } finally {
-      setIsLoading(false);
+      console.error('Login failed:', err);
     }
   };
-
-  // Kết hợp lỗi từ auth context và lỗi cục bộ
-  const displayError = error || authError;
 
   return (
     <div className="flex flex-col items-center w-full">
@@ -161,10 +161,10 @@ export function LoginPage() {
         </div>
         
         {/* Error message */}
-        {displayError && (
+        {error && (
           <div className="flex items-center gap-2 p-3 bg-red-50 text-red-600 rounded border-l-3 border-red-500 text-sm">
             <AlertCircle size={16} />
-            <p className="font-normal">{displayError}</p>
+            <p className="font-normal">{error}</p>
           </div>
         )}
         
@@ -172,6 +172,7 @@ export function LoginPage() {
         <Button 
           type="submit"
           className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium text-base transition-all rounded-lg"
+          disabled={isLoading}
         >
           {isLoading ? (
             <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

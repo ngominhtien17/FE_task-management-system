@@ -1,4 +1,4 @@
-// layouts/main-header.tsx
+// src/layouts/components/MainHeader.tsx
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -6,7 +6,7 @@ import {
   Menu, 
   ChevronLeft, 
   Search,
-  User,
+  User as UserIcon,
   LogOut
 } from "lucide-react";
 import { 
@@ -19,18 +19,31 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+// import { User } from "@/types/auth";
 
 interface MainHeaderProps {
   toggleSidebar: () => void;
   isSidebarCollapsed: boolean;
+  onLogout: () => void;
+  user: User | null;
 }
 
-export function MainHeader({ toggleSidebar, isSidebarCollapsed }: MainHeaderProps) {
+export function MainHeader({ 
+  toggleSidebar, 
+  isSidebarCollapsed, 
+  onLogout,
+  user
+}: MainHeaderProps) {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // Implement actual logout logic here
-    navigate("/auth/login");
+  const getInitials = (name: string) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
   };
 
   return (
@@ -47,7 +60,7 @@ export function MainHeader({ toggleSidebar, isSidebarCollapsed }: MainHeaderProp
         </Button>
         
         <div className="text-xl font-semibold flex items-center gap-2">
-          <span className="text-primary">Tên hệ thống</span>
+          <span className="text-primary">Hệ thống quản lý công việc</span>
         </div>
       </div>
       
@@ -72,24 +85,30 @@ export function MainHeader({ toggleSidebar, isSidebarCollapsed }: MainHeaderProp
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="/avatar-placeholder.png" alt="User avatar" />
-                <AvatarFallback>ND</AvatarFallback>
+                <AvatarImage 
+                  src={user?.customSettings?.profileImage || ""} 
+                  alt={user?.fullName || "User"} 
+                />
+                <AvatarFallback>{user ? getInitials(user.fullName) : "U"}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <div className="flex flex-col space-y-1 p-2">
-              <p className="text-sm font-medium leading-none">Người dùng</p>
-              <p className="text-xs leading-none text-muted-foreground">user@example.com</p>
+              <p className="text-sm font-medium leading-none">{user?.fullName || "Người dùng"}</p>
+              <p className="text-xs leading-none text-muted-foreground">{user?.email || ""}</p>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer">
-              <User className="mr-2 h-4 w-4" />
+            <DropdownMenuItem 
+              className="cursor-pointer"
+              onClick={() => navigate('/profile')}
+            >
+              <UserIcon className="mr-2 h-4 w-4" />
               <span>Tài khoản</span>
             </DropdownMenuItem>
             <DropdownMenuItem 
               className="cursor-pointer text-destructive focus:text-destructive"
-              onClick={handleLogout}
+              onClick={onLogout}
             >
               <LogOut className="mr-2 h-4 w-4" />
               <span>Đăng xuất</span>

@@ -5,7 +5,7 @@ import { AuthLayout } from "@/layouts/auth-layout";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Lazy-loaded Auth Pages
-const LoginPage = lazy(() => import("@/pages/auth/login"));
+const LoginPage = lazy(() => import("@/features/auth/pages/LoginPage"));
 // Thêm các pages khác như Register, ForgotPassword, ResetPassword nếu cần
 
 // Loading Fallback 

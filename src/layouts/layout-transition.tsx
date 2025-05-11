@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { AuthLayout } from "./auth-layout";
-import { MainLayout } from "./main-layout";
+import { MainLayout } from "./MainLayout";
 import { PageTransition } from "@/components/ui/page-transition";
 import { useLoading } from "@/hooks/use-loading";
 
