@@ -13,22 +13,22 @@ export const managementRoutes: RouteObject[] = [
   {
     path: 'users',
     element: (
-      <ProtectedRoute>
+      // <ProtectedRoute>
         <MainLayout>
           <UsersPage />
         </MainLayout>
-      </ProtectedRoute>
+      // </ProtectedRoute>
     ),
   },
   // Cấu trúc tổ chức
   {
     path: 'organization',
     element: (
-      <ProtectedRoute>
+      // <ProtectedRoute>
         <MainLayout>
           <OrganizationPage />
         </MainLayout>
-      </ProtectedRoute>
+      // </ProtectedRoute>
     ),
   },
   // Quản lý công việc

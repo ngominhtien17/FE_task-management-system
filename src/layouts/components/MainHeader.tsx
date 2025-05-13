@@ -6,8 +6,9 @@ import {
   Menu, 
   ChevronLeft, 
   Search,
-  User as UserIcon,
-  LogOut
+  UserIcon,
+  LogOut,
+  ArrowLeft
 } from "lucide-react";
 import { 
   DropdownMenu, 
@@ -18,20 +19,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
-
-// Định nghĩa kiểu dữ liệu cho user
-interface User {
-  id?: string;
-  fullName?: string;
-  email?: string;
-  role?: string;
-  avatar?: string;
-  customSettings?: {
-    profileImage?: string;
-    theme?: string;
-    language?: string;
-  };
-}
 
 interface MainHeaderProps {
   toggleSidebar: () => void;
@@ -59,72 +46,83 @@ export function MainHeader({
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-background border-b z-40 flex items-center px-4">
+    <header className="fixed top-0 left-0 right-0 h-16 bg-white shadow-sm z-40 flex items-center px-4">
       <div className="flex items-center">
         <Button 
           variant="ghost" 
           size="icon" 
           onClick={toggleSidebar} 
-          className="mr-2"
-          aria-label={isSidebarCollapsed ? "Mở rộng thanh bên" : "Thu gọn thanh bên"}
+          className="mr-2 text-blue-700 hover:bg-blue-50"
+          aria-label={isSidebarCollapsed ? "Mở rộng menu" : "Thu gọn menu"}
         >
           {isSidebarCollapsed ? <Menu /> : <ChevronLeft />}
         </Button>
         
+        <ArrowLeft 
+          className="h-6 w-6 mr-2 text-blue-700 cursor-pointer hover:text-blue-800" 
+          onClick={() => navigate(-1)}
+        />
+        
         <div className="text-xl font-semibold flex items-center gap-2">
-          <span className="text-primary">Hệ thống quản lý công việc</span>
+          <span className="text-blue-700 hidden md:inline-block">Hệ thống quản lý công việc</span>
+          <span className="text-blue-700 md:hidden">Task System</span>
         </div>
       </div>
       
       <div className="flex-1 max-w-md mx-auto">
         <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input 
             type="search" 
             placeholder="Tìm kiếm..." 
-            className="w-full pl-8 bg-muted/40"
+            className="w-full pl-10 bg-gray-50 border border-gray-200 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 rounded-lg h-10"
           />
         </div>
       </div>
       
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative text-gray-600 hover:bg-blue-50">
           <Bell className="h-5 w-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full"></span>
+          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>
         </Button>
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-              <Avatar className="h-8 w-8">
+            <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:bg-blue-50 p-0">
+              <Avatar className="h-9 w-9 border-2 border-blue-100">
                 <AvatarImage 
                   src={user?.customSettings?.profileImage} 
                   alt={user?.fullName || "User"} 
                 />
-                <AvatarFallback>{user ? getInitials(user.fullName) : "U"}</AvatarFallback>
+                <AvatarFallback className="bg-blue-600 text-white font-medium">
+                  {user ? getInitials(user.fullName) : "NV"}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end" forceMount>
-            <div className="flex flex-col space-y-1 p-2">
-              <p className="text-sm font-medium leading-none">{user?.fullName || "Người dùng"}</p>
-              <p className="text-xs leading-none text-muted-foreground">{user?.email || ""}</p>
+          <DropdownMenuContent className="w-64" align="end" forceMount>
+            <div className="flex flex-col space-y-1 p-3 bg-blue-50 rounded-t-md">
+              <p className="text-sm font-medium text-gray-800">{user?.fullName || "Người dùng"}</p>
+              <p className="text-xs text-gray-500">{user?.email || ""}</p>
+              <p className="text-xs text-blue-600 font-medium mt-1">{user?.role || ""}</p>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="cursor-pointer"
-              onClick={() => navigate('/profile')}
-            >
-              <UserIcon className="mr-2 h-4 w-4" />
-              <span>Tài khoản</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="cursor-pointer text-destructive focus:text-destructive"
-              onClick={onLogout}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Đăng xuất</span>
-            </DropdownMenuItem>
+            <div className="p-1">
+              <DropdownMenuItem 
+                className="cursor-pointer hover:bg-blue-50 hover:text-blue-700 p-2 rounded-md"
+                onClick={() => navigate('/profile')}
+              >
+                <UserIcon className="mr-2 h-4 w-4" />
+                <span>Tài khoản cá nhân</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="cursor-pointer text-red-500 hover:bg-red-50 hover:text-red-600 p-2 rounded-md mt-1"
+                onClick={onLogout}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Đăng xuất</span>
+              </DropdownMenuItem>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

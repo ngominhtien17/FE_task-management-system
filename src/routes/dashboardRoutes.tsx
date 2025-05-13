@@ -5,7 +5,7 @@ import { MainLayout } from '@/layouts/MainLayout';
 import { ProtectedRoute, LazyLoadWrapper } from './components/RouteComponents';
 
 // Áp dụng tải component trễ (lazy loading) để tối ưu hiệu suất
-const Dashboard = lazy(() => import('@/pages/dashboard/dashboard'));
+const Dashboard = lazy(() => import('@/pages/dashboard'));
 
 /**
  * Định nghĩa tuyến đường cho trang chính và dashboard
@@ -18,9 +18,9 @@ export const dashboardRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <MainLayout>
-          {/* <LazyLoadWrapper>
+          <LazyLoadWrapper>
             <Dashboard />
-          </LazyLoadWrapper> */}
+          </LazyLoadWrapper>
         </MainLayout>
       </ProtectedRoute>
     ),
@@ -31,9 +31,9 @@ export const dashboardRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <MainLayout>
-          {/* <LazyLoadWrapper>
+          <LazyLoadWrapper>
             <Dashboard />
-          </LazyLoadWrapper> */}
+          </LazyLoadWrapper>
         </MainLayout>
       </ProtectedRoute>
     ),
