@@ -1,7 +1,7 @@
 // src/features/task/pages/TaskDetailPage.tsx
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { X, Paperclip, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +14,7 @@ import { TaskStatusBadge } from "../components/TaskStatusBadge";
 import { TaskPriorityBadge } from "../components/TaskPriorityBadge";
 import { TaskComment } from "../types";
 import type { Task } from "../types";
+
 // Mock data for the task detail
 const MOCK_TASK: Task = {
   id: "1",
@@ -47,19 +48,31 @@ interface TaskDetailProps {
   onClose?: () => void;
 }
 
-export function TaskDetailPage({ taskId, isOpen = true, onClose }: TaskDetailProps) {
+export function TaskDetailPage({ taskId, isOpen, onClose }: TaskDetailProps) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
   const [newComment, setNewComment] = useState("");
   const [task] = useState<Task>(MOCK_TASK);
   
+  // Xác định mode hiển thị dựa trên context routing
+  const isRouteMode = location.pathname.includes('/task/detail/');
+  
+  // Lấy taskId từ params nếu ở chế độ route
+  const effectiveTaskId = isRouteMode ? params.id : taskId;
+    
   const handleClose = () => {
     if (onClose) {
       onClose();
+    } else if (isRouteMode) {
+      // Nếu đang ở chế độ route, quay lại trang trước đó (có thể là kanban hoặc list)
+      navigate(-1);
     } else {
+      // Mặc định quay về trang danh sách
       navigate("/task");
     }
   };
-  
+
   const handleSendComment = () => {
     if (!newComment.trim()) return;
     
@@ -225,9 +238,9 @@ export function TaskDetailPage({ taskId, isOpen = true, onClose }: TaskDetailPro
     </div>
   );
 
-  // Can be used as a standalone page or a dialog
-  if (isOpen === undefined) {
-    // Standalone page
+  // Quyết định phương thức hiển thị dựa trên ngữ cảnh routing
+  if (isRouteMode) {
+    // Hiển thị dạng trang độc lập (khi được truy cập qua URL)
     return (
       <div className="p-6 max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
@@ -243,10 +256,16 @@ export function TaskDetailPage({ taskId, isOpen = true, onClose }: TaskDetailPro
     );
   }
   
-  // Dialog mode
+  // Hiển thị dạng dialog (khi được gọi từ component khác)
+  // Điều chỉnh CSS cho DialogContent để khắc phục vấn đề trong suốt
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-4xl">
+      <DialogContent className="sm:max-w-4xl bg-white" style={{
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        zIndex: 50,
+        backgroundColor: "white", // Đảm bảo nền trắng đậm
+        backdropFilter: "none" // Vô hiệu hóa hiệu ứng mờ nếu có
+      }}>
         <DialogHeader>
           <DialogTitle className="text-xl">Chi tiết công việc</DialogTitle>
           <DialogClose />

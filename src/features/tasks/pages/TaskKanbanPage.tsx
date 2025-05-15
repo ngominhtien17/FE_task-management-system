@@ -1,6 +1,6 @@
 // src/features/task/pages/TaskKanbanPage.tsx
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { TaskFilter } from "../components/TaskFilter";
 import { TaskPriorityBadge } from "../components/TaskPriorityBadge";
 import type { Task } from "../types";
+import TaskDetailPage from "./TaskDetailPage";
 
 // Mock data for demonstration
 const MOCK_TASKS: Task[] = [
@@ -122,6 +123,7 @@ const columns = [
   { id: "completed", title: "Hoàn thành", icon: "✓" },
 ];
 
+// Định nghĩa lại component KanbanCard với chức năng điều hướng
 interface KanbanCardProps {
   task: Task;
   onClick: (taskId: string) => void;
@@ -147,6 +149,39 @@ export function TaskKanbanPage() {
   const navigate = useNavigate();
   const [showTaskDetail, setShowTaskDetail] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [columnWidth, setColumnWidth] = useState<number>(280); // Giá trị mặc định
+  
+
+   // Theo dõi kích thước container để điều chỉnh kích thước cột
+   useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.clientWidth;
+        const totalColumns = columns.length;
+        const gap = 24; // Khoảng cách giữa các cột (gap-6 = 1.5rem = 24px)
+        
+        // Tính toán kích thước tối ưu cho cột
+        let optimalWidth = Math.floor((containerWidth - (gap * (totalColumns - 1))) / totalColumns);
+        
+        // Đảm bảo kích thước tối thiểu và tối đa
+        optimalWidth = Math.max(220, Math.min(320, optimalWidth));
+        
+        setColumnWidth(optimalWidth);
+      }
+    };
+    
+    // Khởi tạo kích thước ban đầu
+    handleResize();
+    
+    // Theo dõi thay đổi kích thước cửa sổ
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup event listener khi component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
   
   // Filter tasks by status
   const getTasksByStatus = (status: string) => {
@@ -157,15 +192,24 @@ export function TaskKanbanPage() {
     navigate("/task/create");
   };
   
-  const handleTaskClick = (taskId: string) => {
-    setSelectedTaskId(taskId);
-    setShowTaskDetail(true);
-    // In a real implementation, this would open the task detail modal or navigate to the detail page
-    console.log("Clicked on task:", taskId);
-  };
+  // // Xử lý điều hướng khi nhấp vào task
+  // const handleTaskClick = (taskId: string) => {
+  //   // Điều hướng đến trang chi tiết task
+  //   navigate(`/task/detail/${taskId}`);
+  // };
   
   const handleBackToList = () => {
     navigate("/task");
+  };
+  // Xử lý hiển thị dialog thay vì điều hướng
+  const handleTaskClick = (taskId: string) => {
+    setSelectedTaskId(taskId);
+    setShowTaskDetail(true);
+  };
+  
+  const handleCloseTaskDetail = () => {
+    setShowTaskDetail(false);
+    setSelectedTaskId(null);
   };
   
   const handleSearch = (query: string) => {
@@ -213,10 +257,22 @@ export function TaskKanbanPage() {
           onSort={handleSort} 
         />
         
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 overflow-x-auto pt-2">
+        {/* Bố cục Kanban với scroll ngang và kích thước cột linh hoạt */}
+        <div 
+          ref={containerRef}
+          className="grid grid-flow-col auto-cols-max gap-6 pb-6 overflow-x-auto pt-2 snap-x"
+          style={{ 
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#CBD5E0 #EDF2F7'
+          }}
+        >
           {columns.map(column => (
-            <div key={column.id} className="min-w-80">
-              <div className="bg-gray-50 rounded-lg p-4">
+            <div 
+              key={column.id} 
+              className="snap-start rounded-lg"
+              style={{ width: `${columnWidth}px` }}
+            >
+              <div className="bg-gray-50 rounded-lg p-4 h-full">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-semibold text-gray-700 flex items-center gap-2">
                     <span>{column.icon}</span>
@@ -234,7 +290,7 @@ export function TaskKanbanPage() {
                 
                 <Separator className="mb-4" />
                 
-                <div className="space-y-3">
+                <div className="space-y-3 min-h-64">
                   {getTasksByStatus(column.id).map(task => (
                     <KanbanCard
                       key={task.id}
@@ -262,6 +318,15 @@ export function TaskKanbanPage() {
           ))}
         </div>
       </div>
+
+      {/* Thêm TaskDetailPage dạng dialog */}
+      {showTaskDetail && selectedTaskId && (
+        <TaskDetailPage 
+          taskId={selectedTaskId}
+          isOpen={showTaskDetail}
+          onClose={handleCloseTaskDetail}
+        />
+      )}
     </div>
   );
 }

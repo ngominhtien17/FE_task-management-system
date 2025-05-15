@@ -1,6 +1,7 @@
 // src/features/task/pages/TaskListPage.tsx
 
 import { useState } from "react";
+import { TaskDetailPage } from "../pages/TaskDetailPage";
 import { Plus, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -127,6 +128,10 @@ export function TaskListPage() {
   const [currentTab, setCurrentTab] = useState("all");
   const [currentView, setCurrentView] = useState<"table" | "kanban">("table");
   
+  // Thêm state để kiểm soát việc hiển thị TaskDetail dưới dạng dialog
+  const [showTaskDetail, setShowTaskDetail] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedTasks(MOCK_TASKS.map(task => task.id));
@@ -160,13 +165,22 @@ export function TaskListPage() {
   
   const handleViewTask = (taskId: string) => {
     // Can be implemented as a modal or navigation to detail page
-    console.log("View task:", taskId);
+    // 1. Hiển thị dưới dạng dialog
+    setSelectedTaskId(taskId);
+    setShowTaskDetail(true);
+
+    // 2. Hoặc điều hướng đến trang chi tiết
+    // navigate(`/task/detail/${taskId}`);
   };
   
   const handleCreateTask = () => {
     navigate("/task/create");
   };
-  
+
+  const handleCloseTaskDetail = () => {
+    setShowTaskDetail(false);
+  };
+
   const handleViewChange = (view: "table" | "kanban") => {
     if (view === "kanban") {
       navigate("/task/kanban");
@@ -318,6 +332,14 @@ export function TaskListPage() {
           </div>
         </div>
       </div>
+      {/* Thêm điều kiện hiển thị TaskDetailPage */}
+      {showTaskDetail && selectedTaskId && (
+        <TaskDetailPage 
+          taskId={selectedTaskId} 
+          isOpen={showTaskDetail} 
+          onClose={handleCloseTaskDetail} 
+        />
+      )}
     </div>
   );
 }
