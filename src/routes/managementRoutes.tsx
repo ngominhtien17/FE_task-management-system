@@ -1,7 +1,9 @@
 // src/routes/managementRoutes.tsx
+import { lazy } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
-import { ProtectedRoute, UsersPage, OrganizationPage, TasksPage, GroupsPage, ResourcesPage } from './components/RouteComponents';
+import { ProtectedRoute, UsersPage, OrganizationPage, GroupsPage, ResourcesPage } from './components/RouteComponents';
+import { taskRoutes } from './taskRoutes';
 
 /**
  * Định nghĩa các tuyến đường liên quan đến chức năng quản lý
@@ -31,17 +33,8 @@ export const managementRoutes: RouteObject[] = [
       // </ProtectedRoute>
     ),
   },
-  // Quản lý công việc
-  {
-    path: 'tasks',
-    element: (
-      <ProtectedRoute>
-        <MainLayout>
-          <TasksPage />
-        </MainLayout>
-      </ProtectedRoute>
-    ),
-  },
+  // Module Quản lý công việc
+  taskRoutes,
   // Quản lý nhóm
   {
     path: 'groups',

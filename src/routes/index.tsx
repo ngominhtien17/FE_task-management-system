@@ -9,6 +9,7 @@ import { reportRoutes } from './reportRoutes';
 import { settingsRoutes } from './settingsRoutes';
 import { profileRoutes } from './profileRoutes';
 import { otherRoutes } from './otherRoutes';
+import { taskRoutes } from './taskRoutes';
 
 /**
  * AppRouter - Component định tuyến chính của ứng dụng
@@ -30,7 +31,10 @@ export function AppRouter() {
     
     // Quản lý - Người dùng, tổ chức, công việc, nhóm, tài nguyên
     ...managementRoutes,
-    
+
+    // Quản lý công việc
+    ...taskRoutes,
+
     // Báo cáo - Các báo cáo thống kê
     ...reportRoutes,
     
