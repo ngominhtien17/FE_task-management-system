@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { TaskFilter } from "../components/TaskFilter";
@@ -242,12 +242,21 @@ export function TaskKanbanPage() {
           </Button>
           <h1 className="text-2xl font-bold text-gray-800">Quản lý Công Việc</h1>
         </div>
-        <Button 
-          onClick={handleCreateTask}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          <Plus size={18} className="mr-1" /> Tạo công việc
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            onClick={() => navigate("/task/workflow")}
+            className="mr-2"
+          >
+            <Info size={18} className="mr-1" /> Hướng dẫn quy trình
+          </Button>
+          <Button 
+            onClick={handleCreateTask}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Plus size={18} className="mr-1" /> Tạo công việc
+          </Button>
+        </div>
       </div>
       
       <div className="grid gap-4">

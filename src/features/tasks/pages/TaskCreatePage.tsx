@@ -89,6 +89,12 @@ export function TaskCreatePage() {
   const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+  const handleDateChange = (field: keyof TaskFormData, date: Date | undefined) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: date || null // Chuyển đổi undefined thành null
+    }));
+  };
 
   const handleCategoryToggle = (categoryId: string) => {
     setFormData(prev => {
@@ -267,7 +273,7 @@ export function TaskCreatePage() {
                     <SelectTrigger id="department" className="w-full">
                       <SelectValue placeholder="Chọn đơn vị" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white shadow-lg border border-gray-200 rounded-md">
                       {departments.map(dept => (
                         <SelectItem key={dept.id} value={dept.id}>
                           {dept.name}
@@ -286,7 +292,7 @@ export function TaskCreatePage() {
                     <SelectTrigger id="priority" className="w-full">
                       <SelectValue placeholder="Chọn mức độ ưu tiên" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white shadow-lg border border-gray-200 rounded-md">
                       <SelectItem value="high">🔴 Cao</SelectItem>
                       <SelectItem value="medium">🟠 Trung bình</SelectItem>
                       <SelectItem value="low">🟢 Thấp</SelectItem>
@@ -340,12 +346,12 @@ export function TaskCreatePage() {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={formData.startDate || undefined}
-                        onSelect={(date) => setFormData(prev => ({ ...prev, startDate: date }))}
-                        initialFocus
-                      />
+                    <Calendar
+                      mode="single"
+                      selected={formData.startDate || undefined}
+                      onSelect={(date) => handleDateChange('startDate', date)}
+                      initialFocus
+                    />
                     </PopoverContent>
                   </Popover>
                 </div>
@@ -366,18 +372,18 @@ export function TaskCreatePage() {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={formData.endDate || undefined}
-                        onSelect={(date) => setFormData(prev => ({ ...prev, endDate: date }))}
-                        initialFocus
-                        disabled={(date) => {
-                          if (formData.startDate) {
-                            return date < formData.startDate;
-                          }
-                          return false;
-                        }}
-                      />
+                    <Calendar
+                      mode="single"
+                      selected={formData.endDate || undefined}
+                      onSelect={(date) => handleDateChange('endDate', date)}
+                      initialFocus
+                      disabled={(date) => {
+                        if (formData.startDate) {
+                          return date < formData.startDate;
+                        }
+                        return false;
+                      }}
+                    />
                     </PopoverContent>
                   </Popover>
                 </div>

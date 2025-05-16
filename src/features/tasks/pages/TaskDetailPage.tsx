@@ -42,6 +42,7 @@ const MOCK_TASK: Task = {
   ]
 };
 
+
 interface TaskDetailProps {
   taskId?: string;
   isOpen?: boolean;
@@ -81,16 +82,79 @@ export function TaskDetailPage({ taskId, isOpen, onClose }: TaskDetailProps) {
     setNewComment("");
   };
   
-  const handleUpdateStatus = (newStatus: string) => {
-    console.log("Updating status to:", newStatus);
+    // Cập nhật phương thức xử lý sự kiện trong TaskDetailPage.tsx
+  const handleUpdateProgress = () => {
+    navigate(`/task/progress/${task.id}`);
   };
-  
+
   const handleRequestExtension = () => {
-    console.log("Requesting deadline extension");
+    navigate(`/task/extend/${task.id}`);
   };
-  
+
   const handleCompleteTask = () => {
-    console.log("Marking task as complete");
+    navigate(`/task/complete/${task.id}`);
+  };
+
+    // Thêm hàm kiểm tra quyền để hiển thị các hành động phù hợp
+  const isManager = true; // Mô phỏng kiểm tra quyền quản lý
+  const isCreator = task.creator === "Nguyễn Văn A"; // Mô phỏng kiểm tra người tạo
+  const isAssignee = task.assignee === "Nguyễn Văn A"; // Mô phỏng kiểm tra người được giao
+
+  // Phương thức hiển thị các nút hành động phù hợp
+  const renderActionButtons = () => {
+    const buttons = [];
+    
+    // Nút quay lại luôn hiển thị
+    buttons.push(
+      <Button key="back" variant="outline" onClick={handleClose}>
+        Quay lại
+      </Button>
+    );
+    
+    // Các nút tùy theo trạng thái
+    if (isManager || isCreator) {
+      buttons.push(
+        <Button key="edit" variant="outline">
+          Chỉnh sửa
+        </Button>
+      );
+    }
+    
+    if (isAssignee && (task.status === "not_started" || task.status === "in_progress" || task.status === "overdue")) {
+      buttons.push(
+        <Button key="update" variant="outline" onClick={handleUpdateProgress}>
+          Cập nhật tiến độ
+        </Button>
+      );
+    }
+    
+    if (isAssignee && (task.status === "in_progress" || task.status === "overdue")) {
+      buttons.push(
+        <Button key="extension" variant="outline" onClick={handleRequestExtension}>
+          Yêu cầu gia hạn
+        </Button>
+      );
+      
+      buttons.push(
+        <Button key="complete" onClick={handleCompleteTask}>
+          Báo cáo hoàn thành
+        </Button>
+      );
+    }
+    
+    if (isManager && task.status === "completed") {
+      buttons.push(
+        <Button key="evaluate" onClick={() => navigate(`/task/evaluate/${task.id}`)}>
+          Đánh giá công việc
+        </Button>
+      );
+    }
+    
+    return (
+      <div className="flex flex-wrap gap-3">
+        {buttons}
+      </div>
+    );
   };
 
   const renderTaskDetail = () => (
@@ -219,21 +283,7 @@ export function TaskDetailPage({ taskId, isOpen, onClose }: TaskDetailProps) {
       <Separator />
       
       <div className="flex flex-wrap gap-3">
-        <Button variant="outline" onClick={handleClose}>
-          Quay lại
-        </Button>
-        <Button variant="outline">
-          Chỉnh sửa
-        </Button>
-        <Button variant="outline">
-          Cập nhật tiến độ
-        </Button>
-        <Button variant="outline" onClick={handleRequestExtension}>
-          Yêu cầu gia hạn
-        </Button>
-        <Button onClick={handleCompleteTask}>
-          Hoàn thành
-        </Button>
+        {renderActionButtons()}
       </div>
     </div>
   );
