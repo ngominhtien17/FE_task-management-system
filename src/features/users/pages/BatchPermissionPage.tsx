@@ -38,7 +38,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeftIcon, SearchIcon } from 'lucide-react';
 
-import { User, Department, Role } from '../types';
+import { UserStatus } from '../types';
+type Department = {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  parentId?: string;
+};
+import type { User } from '../types'
+
 import { mockUsers, mockDepartments, mockRoles, searchUsers } from '../utils/mockData';
 
 type StepProps = {
@@ -266,7 +275,7 @@ const BatchPermissionPage: React.FC = () => {
                   <SelectValue placeholder="Đơn vị" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Tất cả</SelectItem>
+                  <SelectItem value="all">Tất cả</SelectItem>
                   {mockDepartments.map(dept => (
                     <SelectItem key={dept.id} value={dept.id}>
                       {dept.name}

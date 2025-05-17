@@ -60,8 +60,17 @@ import {
   UsersIcon 
 } from 'lucide-react';
 
-import { UserStatus, Department } from '../types';
-import type { User } from '../types';
+
+// Sử dụng định nghĩa inline:
+import { UserStatus } from '../types';
+type Department = {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  parentId?: string;
+};
+import type { User } from '../types'
 import { mockUsers, searchUsers, mockDepartments, mockRoles } from '../utils/mockData';
 
 const UserStatusBadge = ({ status }: { status: UserStatus }) => {

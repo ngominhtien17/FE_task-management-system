@@ -31,7 +31,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { RefreshCwIcon, ArrowLeftIcon } from 'lucide-react';
-import { mockDepartments, mockPositions, mockRoles, mockUsers } from '../utils/mockData';
+import { mockDepartments, mockPositions, mockRoles, mockUsers,mockPermissions } from '../utils/mockData';
 import { PasswordStrength } from '../types';
 
 // Schema xác thực form

@@ -318,7 +318,18 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({
   // Cấu hình điều hướng với cấu trúc phân cấp
   const navigationItems = [
     { icon: <Home size={20} />, label: "Trang chủ", href: "/dashboard" },
-    { icon: <Users size={20} />, label: "Quản lý người dùng", href: "/users" },
+    { 
+      icon: <Users size={20} />, 
+      label: "Quản lý người dùng", 
+      href: "/users",
+      isParentMenu: true,  // Đánh dấu đây là menu cha
+      children: [
+        { icon: <List size={18} />, label: "Danh sách người dùng", href: "/users" },
+        { icon: <PlusCircle size={18} />, label: "Tạo tài khoản mới", href: "/users/create" },
+        { icon: <Users2 size={18} />, label: "Phân quyền hàng loạt", href: "/users/batch-permission" },
+        { icon: <FolderPlus size={18} />, label: "Nhập từ file", href: "/users/import" }
+      ]
+    },
     { icon: <FolderTree size={20} />, label: "Cấu trúc tổ chức", href: "/organization" },
     { 
       icon: <CheckSquare size={20} />, 
