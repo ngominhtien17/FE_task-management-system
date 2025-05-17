@@ -4,12 +4,12 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 // Import các nhóm tuyến đường theo chức năng
 import { authRoutes } from './authRoutes';
 import { dashboardRoutes } from './dashboardRoutes';
-import { managementRoutes } from './managementRoutes';
 import { reportRoutes } from './reportRoutes';
 import { settingsRoutes } from './settingsRoutes';
 import { profileRoutes } from './profileRoutes';
 import { otherRoutes } from './otherRoutes';
 import { taskRoutes } from './taskRoutes';
+import { usersRoutes } from './usersRoutes';
 
 /**
  * AppRouter - Component định tuyến chính của ứng dụng
@@ -29,8 +29,8 @@ export function AppRouter() {
     // Dashboard - Trang chính và dashboard
     ...dashboardRoutes,
     
-    // Quản lý - Người dùng, tổ chức, công việc, nhóm, tài nguyên
-    ...managementRoutes,
+    // Quản lý - Người dùng
+    ...usersRoutes,
 
     // Quản lý công việc
     ...taskRoutes,

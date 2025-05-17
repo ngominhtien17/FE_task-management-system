@@ -327,8 +327,8 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({
       badge: mockBadges.tasks,
       isParentMenu: true,  // Đánh dấu đây là menu cha
       children: [
-        { icon: <List size={18} />, label: "Danh sách công việc", href: "/task", exactPath: true },
-        { icon: <Kanban size={18} />, label: "Bảng Kanban", href: "/task/kanban", exactPath: true },
+        { icon: <List size={18} />, label: "Danh sách công việc", href: "/task" },
+        { icon: <Kanban size={18} />, label: "Bảng Kanban", href: "/task/kanban" },
         { icon: <PlusCircle size={18} />, label: "Tạo công việc mới", href: "/task/create" },
         { icon: <Users2 size={18} />, label: "Phân công hàng loạt", href: "/task/batch-assign" },
         { icon: <FolderPlus size={18} />, label: "Quản lý danh mục", href: "/task/categories" },
