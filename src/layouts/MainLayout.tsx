@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { MainHeader } from "./components/MainHeader";
 import { MainSidebar } from "./components/MainSidebar";
+import { AppBreadcrumb } from "@/components/breadcrumb";
+import { BreadcrumbProvider } from "@/components/breadcrumb";
 
 interface MainLayoutProps {
   children?: React.ReactNode;
@@ -59,35 +61,38 @@ export function MainLayout({ children }: MainLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <MainHeader
-        toggleSidebar={toggleSidebar}
-        isSidebarCollapsed={isSidebarCollapsed}
-        onLogout={handleLogout}
-        user={mockUser}
-      />
+    <BreadcrumbProvider>
+      <div className="min-h-screen bg-background">
+        <MainHeader
+          toggleSidebar={toggleSidebar}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onLogout={handleLogout}
+          user={mockUser}
+        />
 
-      <MainSidebar
-        isCollapsed={isSidebarCollapsed}
-        setIsCollapsed={setIsSidebarCollapsed}
-        isMobile={isMobile}
-      />
+        <MainSidebar
+          isCollapsed={isSidebarCollapsed}
+          setIsCollapsed={setIsSidebarCollapsed}
+          isMobile={isMobile}
+        />
 
-      <main
-        className={`pt-16 transition-all duration-300 ${
-          isSidebarCollapsed 
-            ? isMobile 
-              ? "pl-0" 
-              : "pl-16" 
-            : "pl-60"
-        }`}
-      >
-        <div className="container p-4 md:p-6">
-
+        <main
+          className={`pt-16 transition-all duration-300 ${
+            isSidebarCollapsed 
+              ? isMobile 
+                ? "pl-0" 
+                : "pl-16" 
+              : "pl-60"
+          }`}
+        >
+          <div className="container p-4 md:p-6">
+            {/* Thêm thành phần AppBreadcrumb vào đây */}
+            <AppBreadcrumb className="mb-4" />
+            
             {children || <Outlet />}
-
-        </div>
-      </main>
-    </div>
+          </div>
+        </main>
+      </div>
+    </BreadcrumbProvider>
   );
 }

@@ -56,6 +56,11 @@ const NavItem: React.FC<NavItemProps> = ({
       return currentPath === '/task' || currentPath.startsWith('/task/');
     }
     
+    // Trường hợp cho menu cha "Quản lý người dùng" - luôn active khi ở bất kỳ trang /users nào
+    if (isParentMenu && href === '/users') {
+      return currentPath === '/users' || currentPath.startsWith('/users/');
+    }
+    
     // Xử lý trường hợp so khớp chính xác cho các menu con
     if (exactPath) {
       return currentPath === href;
@@ -239,6 +244,11 @@ const NavItem: React.FC<NavItemProps> = ({
           finalActive = currentPath === '/task' || currentPath.startsWith('/task/');
         }
         
+        if (isParentMenu && href === '/users') {
+          const currentPath = location.pathname;
+          finalActive = currentPath === '/users' || currentPath.startsWith('/users/');
+        }
+        
         if (exactPath) {
           finalActive = location.pathname === href;
         }
@@ -282,7 +292,12 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({
 }) => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(["task"]));
+  
+  // Khởi tạo trạng thái từ localStorage hoặc set rỗng nếu khởi chạy lần đầu
+  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(() => {
+    const savedState = localStorage.getItem('expandedMenus');
+    return savedState ? new Set(JSON.parse(savedState)) : new Set();
+  });
 
   // Mock data cho huy hiệu
   const mockBadges: Record<string, number> = {
@@ -302,7 +317,33 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({
     }
   }, [location.pathname, isMobile]);
 
-  // Hàm xử lý đóng/mở menu
+  // Đồng bộ hóa trạng thái menu dựa trên URL hiện tại khi component được mount
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const pathSegment = currentPath.split('/')[1]; // Lấy phần đầu tiên của path
+    
+    // Nếu đang ở trang có menu con và menu đó chưa mở, tự động mở nó
+    if ((currentPath.startsWith('/users/') || currentPath === '/users') && 
+        !expandedMenus.has('users')) {
+      setExpandedMenus(prev => {
+        const newSet = new Set(prev);
+        newSet.add('users');
+        localStorage.setItem('expandedMenus', JSON.stringify([...newSet]));
+        return newSet;
+      });
+    } else if ((currentPath.startsWith('/task/') || currentPath === '/task') && 
+        !expandedMenus.has('task')) {
+      setExpandedMenus(prev => {
+        const newSet = new Set(prev);
+        newSet.add('task');
+        localStorage.setItem('expandedMenus', JSON.stringify([...newSet]));
+        return newSet;
+      });
+    }
+    // Có thể thêm các menu khác tại đây nếu cần
+  }, []); // Chỉ chạy một lần khi component được mount
+
+  // Hàm xử lý đóng/mở menu và lưu trạng thái vào localStorage
   const toggleMenu = (menuId: string) => {
     setExpandedMenus(prev => {
       const newSet = new Set(prev);
@@ -311,6 +352,8 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({
       } else {
         newSet.add(menuId);
       }
+      // Lưu trạng thái mới vào localStorage
+      localStorage.setItem('expandedMenus', JSON.stringify([...newSet]));
       return newSet;
     });
   };

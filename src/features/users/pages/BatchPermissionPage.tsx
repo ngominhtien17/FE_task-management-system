@@ -33,7 +33,6 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from '@/components/ui/pagination';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeftIcon, SearchIcon } from 'lucide-react';
@@ -198,21 +197,9 @@ const BatchPermissionPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
-      {/* Breadcrumb */}
-      <Breadcrumb className="mb-4">
-        <BreadcrumbItem>
-          <BreadcrumbLink as={Link} to="/">Trang chủ</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink as={Link} to="/users">Quản lý người dùng</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink>Phân quyền hàng loạt</BreadcrumbLink>
-        </BreadcrumbItem>
-      </Breadcrumb>
       
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Phân quyền hàng loạt</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Phân quyền hàng loạt</h1>
         <Button 
           variant="outline" 
           onClick={() => navigate('/users')}

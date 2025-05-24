@@ -41,7 +41,6 @@ import {
   PaginationPrevious 
 } from '@/components/ui/pagination';
 import { Badge } from '@/components/ui/badge';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from '@/components/ui/breadcrumb';
 import { 
   Dialog, 
   DialogContent, 
@@ -180,17 +179,8 @@ const UserListPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6">
-      {/* Breadcrumb */}
-      <Breadcrumb className="mb-4">
-        <BreadcrumbItem>
-          <BreadcrumbLink as={Link} to="/">Trang chủ</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink as={Link} to="/users">Quản lý người dùng</BreadcrumbLink>
-        </BreadcrumbItem>
-      </Breadcrumb>
 
-      <h1 className="text-2xl font-semibold mb-6">Quản lý người dùng</h1>
+      <h1 className="text-2xl font-bold text-gray-800">Quản lý người dùng</h1>
 
       {/* Thanh công cụ */}
       <div className="flex flex-wrap gap-3 mb-6">

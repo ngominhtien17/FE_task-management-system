@@ -237,9 +237,6 @@ export function TaskKanbanPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="icon" onClick={handleBackToList} className="h-10 w-10">
-            <ArrowLeft size={18} />
-          </Button>
           <h1 className="text-2xl font-bold text-gray-800">Quản lý Công Việc</h1>
         </div>
         <div className="flex gap-2">
