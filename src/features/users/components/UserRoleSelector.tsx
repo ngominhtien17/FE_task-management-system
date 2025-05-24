@@ -11,7 +11,7 @@ interface UserRoleSelectorProps {
   readOnly?: boolean;
 }
 
-const UserRoleSelector: React.FC<UserRoleSelectorProps> = ({
+export const RoleSelector: React.FC<UserRoleSelectorProps> = ({
   roles,
   selectedRoleIds,
   onChange,
@@ -74,5 +74,3 @@ const UserRoleSelector: React.FC<UserRoleSelectorProps> = ({
     </div>
   );
 };
-
-export default UserRoleSelector;

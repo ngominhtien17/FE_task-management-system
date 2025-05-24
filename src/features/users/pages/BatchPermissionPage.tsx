@@ -1,173 +1,90 @@
-// src/features/users/pages/BatchPermissionPage.tsx
+// src/features/users/pages/BatchPermissionPage.tsx - Cải tiến
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious 
-} from '@/components/ui/pagination';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeftIcon, SearchIcon } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Separator } from '@/components/ui/separator';
 
-import { UserStatus } from '../types';
-type Department = {
-  id: string;
-  name: string;
-  code: string;
-  description?: string;
-  parentId?: string;
-};
-import type { User } from '../types'
+import { ArrowLeftIcon, UsersIcon, ShieldIcon, CheckCircleIcon, AlertTriangleIcon } from 'lucide-react';
 
-import { mockUsers, mockDepartments, mockRoles, searchUsers } from '../utils/mockData';
-
-type StepProps = {
-  step: number;
-  isActive: boolean;
-  isCompleted: boolean;
-  title: string;
-};
-
-// Component hiển thị bước trong quy trình phân quyền hàng loạt
-const StepIndicator: React.FC<StepProps> = ({ step, isActive, isCompleted, title }) => {
-  return (
-    <div className="flex flex-col items-center">
-      <div 
-        className={`w-10 h-10 rounded-full flex items-center justify-center mb-1 ${
-          isActive ? 'bg-blue-600 text-white font-medium' : 
-          isCompleted ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'
-        }`}
-      >
-        {step}
-      </div>
-      <div className={`text-sm ${isActive ? 'font-medium' : 'text-gray-500'}`}>
-        {title}
-      </div>
-    </div>
-  );
-};
+import { UserFilter } from '../components/UserFilter';
+import { UserPagination } from '../components/UserPagination';
+import { UserDataTable } from '../components/UserDataTable';
+import { RoleSelector } from '../components/UserRoleSelector';
+import { PermissionSelector } from '../components/UserPermissionSelector';
+import { BatchOperationSummary } from '../components/BatchOperationSummary';
 
 const BatchPermissionPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Multi-step state management
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
-  const [searchParams, setSearchParams] = useState({
-    keyword: '',
-    departmentId: '',
-    page: 1,
-    pageSize: 10
-  });
+  const [operationMode, setOperationMode] = useState<'replace' | 'add' | 'remove'>('replace');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingProgress, setProcessingProgress] = useState(0);
 
-  // Tìm kiếm người dùng dựa trên tham số hiện tại
-  const searchResult = useMemo(() => {
-    return searchUsers({
-      keyword: searchParams.keyword,
-      departmentId: searchParams.departmentId || undefined,
-      page: searchParams.page,
-      pageSize: searchParams.pageSize
-    });
-  }, [searchParams]);
+  // Enhanced step configuration
+  const steps = [
+    { 
+      id: 1, 
+      title: 'Chọn người dùng', 
+      description: 'Lựa chọn người dùng cần phân quyền',
+      icon: UsersIcon,
+      validation: () => selectedUsers.length > 0
+    },
+    { 
+      id: 2, 
+      title: 'Cấu hình quyền', 
+      description: 'Thiết lập vai trò và quyền hạn',
+      icon: ShieldIcon,
+      validation: () => selectedRoles.length > 0 || selectedPermissions.length > 0
+    },
+    { 
+      id: 3, 
+      title: 'Xác nhận và thực thi', 
+      description: 'Xem lại và áp dụng thay đổi',
+      icon: CheckCircleIcon,
+      validation: () => true
+    }
+  ];
 
-  // Nếu có danh sách người dùng được chọn trước đó từ trang UserListPage
+  // Initialize from previous selection
   useEffect(() => {
     if (location.state?.selectedUserIds) {
       setSelectedUsers(location.state.selectedUserIds);
     }
   }, [location.state]);
 
-  // Xử lý chọn/bỏ chọn tất cả người dùng
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedUsers(searchResult.data.map(user => user.id));
-    } else {
-      setSelectedUsers([]);
-    }
+  // Calculate form progress
+  const getStepProgress = () => {
+    const completedSteps = steps.filter(step => step.validation()).length;
+    return Math.round((completedSteps / steps.length) * 100);
   };
 
-  // Xử lý chọn/bỏ chọn một người dùng
-  const handleSelectUser = (userId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedUsers(prev => [...prev, userId]);
-    } else {
-      setSelectedUsers(prev => prev.filter(id => id !== userId));
-    }
-  };
-
-  // Xử lý tìm kiếm
-  const handleSearch = () => {
-    setSearchParams(prev => ({ ...prev, page: 1 }));
-  };
-
-  // Xử lý thay đổi trang
-  const handlePageChange = (page: number) => {
-    setSearchParams(prev => ({ ...prev, page }));
-  };
-
-  // Chuyển sang bước tiếp theo
-  const handleNextStep = () => {
-    if (currentStep === 1 && selectedUsers.length === 0) {
-      // Hiển thị thông báo lỗi
-      alert('Vui lòng chọn ít nhất một người dùng');
+  // Enhanced navigation handlers
+  const handleNextStep = async () => {
+    const currentStepConfig = steps[currentStep - 1];
+    
+    if (!currentStepConfig.validation()) {
+      // Show validation error
       return;
     }
-    
-    if (currentStep === 2 && selectedRoles.length === 0 && selectedPermissions.length === 0) {
-      // Hiển thị thông báo lỗi
-      alert('Vui lòng chọn ít nhất một vai trò hoặc quyền hạn');
-      return;
-    }
-    
-    if (currentStep < 2) {
+
+    if (currentStep < steps.length) {
       setCurrentStep(prev => prev + 1);
     } else {
-      // Hoàn thành quá trình phân quyền hàng loạt
-      console.log('Phân quyền hàng loạt cho users:', selectedUsers);
-      console.log('Vai trò đã chọn:', selectedRoles);
-      console.log('Quyền hạn đã chọn:', selectedPermissions);
-      
-      // TODO: Gọi API cập nhật quyền hàng loạt
-      
-      // Chuyển về trang danh sách người dùng
-      navigate('/users', { 
-        state: { 
-          successMessage: 'Phân quyền hàng loạt thành công' 
-        } 
-      });
+      // Execute batch operation
+      await executeBatchOperation();
     }
   };
 
-  // Quay lại bước trước
   const handlePrevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
@@ -176,368 +93,294 @@ const BatchPermissionPage: React.FC = () => {
     }
   };
 
-  // Lấy thông tin đã chọn
-  const getSelectedUsersInfo = () => {
-    const users = mockUsers.filter(user => selectedUsers.includes(user.id));
-    
-    // Nhóm người dùng theo phòng ban
-    const departmentGroups: { [key: string]: number } = {};
-    users.forEach(user => {
-      const deptName = user.department?.name || 'Chưa phân bộ môn';
-      departmentGroups[deptName] = (departmentGroups[deptName] || 0) + 1;
-    });
-    
-    return {
-      users,
-      departmentGroups
-    };
+  // Enhanced batch operation execution
+  const executeBatchOperation = async () => {
+    setIsProcessing(true);
+    setProcessingProgress(0);
+
+    try {
+      const totalUsers = selectedUsers.length;
+      
+      for (let i = 0; i < totalUsers; i++) {
+        // Simulate processing each user
+        await new Promise(resolve => setTimeout(resolve, 200));
+        setProcessingProgress(Math.round(((i + 1) / totalUsers) * 100));
+      }
+
+      // Success handling
+      setTimeout(() => {
+        navigate('/users', {
+          state: {
+            successMessage: `Đã phân quyền thành công cho ${totalUsers} người dùng`,
+            batchOperationResult: {
+              mode: operationMode,
+              userCount: totalUsers,
+              roles: selectedRoles,
+              permissions: selectedPermissions
+            }
+          }
+        });
+      }, 1000);
+
+    } catch (error) {
+      console.error('Batch operation failed:', error);
+      setIsProcessing(false);
+    }
   };
 
-  const selectedUsersInfo = getSelectedUsersInfo();
+  // Render step content
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UsersIcon className="w-5 h-5" />
+                  Chọn người dùng cần phân quyền
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <UserFilter 
+                  onSearch={() => {}} 
+                  onFilter={() => {}}
+                  showAdvanced={false}
+                  onToggleAdvanced={() => {}}
+                />
+                
+                <div className="mt-4">
+                  <UserDataTable 
+                    selectedUsers={selectedUsers}
+                    onSelectionChange={setSelectedUsers}
+                    multiSelect={true}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {selectedUsers.length > 0 && (
+              <Card>
+                <CardContent className="py-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">
+                      Đã chọn {selectedUsers.length} người dùng
+                    </span>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSelectedUsers([])}
+                    >
+                      Bỏ chọn tất cả
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShieldIcon className="w-5 h-5" />
+                  Cấu hình quyền hạn
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Operation Mode Selector */}
+                <div>
+                  <label className="block text-sm font-medium mb-3">
+                    Chế độ phân quyền
+                  </label>
+                  <div className="grid grid-cols-3 gap-4">
+                    {[
+                      { 
+                        mode: 'replace' as const, 
+                        title: 'Thay thế', 
+                        description: 'Thay thế toàn bộ quyền hiện tại' 
+                      },
+                      { 
+                        mode: 'add' as const, 
+                        title: 'Thêm mới', 
+                        description: 'Thêm quyền vào quyền hiện tại' 
+                      },
+                      { 
+                        mode: 'remove' as const, 
+                        title: 'Gỡ bỏ', 
+                        description: 'Gỡ bỏ quyền khỏi quyền hiện tại' 
+                      }
+                    ].map(({ mode, title, description }) => (
+                      <Card 
+                        key={mode}
+                        className={`cursor-pointer transition-all ${
+                          operationMode === mode ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-gray-50'
+                        }`}
+                        onClick={() => setOperationMode(mode)}
+                      >
+                        <CardContent className="p-4 text-center">
+                          <div className="font-medium">{title}</div>
+                          <div className="text-xs text-gray-600 mt-1">{description}</div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Role Selection */}
+                <RoleSelector 
+                  selectedRoles={selectedRoles}
+                  onSelectionChange={setSelectedRoles}
+                  mode={operationMode}
+                />
+
+                <Separator />
+
+                {/* Permission Selection */}
+                <PermissionSelector 
+                  selectedPermissions={selectedPermissions}
+                  onSelectionChange={setSelectedPermissions}
+                  mode={operationMode}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-6">
+            {isProcessing ? (
+              <Card>
+                <CardContent className="py-8">
+                  <div className="text-center space-y-4">
+                    <div className="text-lg font-medium">
+                      Đang thực hiện phân quyền hàng loạt...
+                    </div>
+                    <Progress value={processingProgress} className="w-full max-w-md mx-auto" />
+                    <div className="text-sm text-gray-600">
+                      {processingProgress}% hoàn thành
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <BatchOperationSummary 
+                selectedUsers={selectedUsers}
+                selectedRoles={selectedRoles}
+                selectedPermissions={selectedPermissions}
+                operationMode={operationMode}
+              />
+            )}
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="container mx-auto p-6">
-      
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Phân quyền hàng loạt</h1>
+    <div className="p-6 space-y-6">
+      {/* Header Section */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Phân quyền hàng loạt</h1>
+          <p className="text-sm text-gray-600 mt-1">
+            Quản lý quyền hạn cho nhiều người dùng cùng lúc
+          </p>
+        </div>
         <Button 
           variant="outline" 
           onClick={() => navigate('/users')}
+          disabled={isProcessing}
         >
           <ArrowLeftIcon className="w-4 h-4 mr-2" />
           Quay lại
         </Button>
       </div>
-      
-      {/* Hiển thị các bước */}
-      <div className="flex justify-center mb-8">
-        <div className="flex items-center">
-          <StepIndicator 
-            step={1} 
-            isActive={currentStep === 1} 
-            isCompleted={currentStep > 1}
-            title="Chọn người dùng" 
-          />
-          
-          <div className="w-16 h-1 bg-gray-200 mx-2">
-            {currentStep > 1 && <div className="h-full bg-green-500" />}
-          </div>
-          
-          <StepIndicator 
-            step={2} 
-            isActive={currentStep === 2} 
-            isCompleted={currentStep > 2}
-            title="Thiết lập quyền" 
-          />
-        </div>
-      </div>
-      
-      {/* Bước 1: Chọn người dùng */}
-      {currentStep === 1 && (
-        <>
-          {/* Thông tin đã chọn */}
-          <Card className="mb-6">
-            <CardContent className="py-4">
-              <div className="text-sm">
-                <span className="font-medium">Đã chọn: {selectedUsers.length} người dùng</span>
-                {selectedUsers.length > 0 && (
-                  <span className="ml-2">
-                    | Bộ môn: {Object.entries(selectedUsersInfo.departmentGroups)
-                      .map(([dept, count]) => `${dept} (${count})`)
-                      .join(', ')}
-                  </span>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Lọc và tìm kiếm */}
-          <div className="flex flex-wrap gap-4 mb-6">
-            <div className="w-64">
-              <Select 
-                value={searchParams.departmentId} 
-                onValueChange={(value) => setSearchParams(prev => ({ ...prev, departmentId: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Đơn vị" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tất cả</SelectItem>
-                  {mockDepartments.map(dept => (
-                    <SelectItem key={dept.id} value={dept.id}>
-                      {dept.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+
+      {/* Progress Indicator */}
+      <Card>
+        <CardContent className="py-4">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">
+                Tiến độ: Bước {currentStep} / {steps.length}
+              </span>
+              <span className="text-sm text-gray-500">
+                {getStepProgress()}% hoàn thành
+              </span>
             </div>
             
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <Input 
-                  type="text" 
-                  placeholder="Tìm kiếm người dùng..." 
-                  className="pr-10"
-                  value={searchParams.keyword}
-                  onChange={(e) => setSearchParams(prev => ({ ...prev, keyword: e.target.value }))}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                />
-                <Button 
-                  variant="ghost" 
-                  className="absolute right-0 top-0 h-full" 
-                  onClick={handleSearch}
-                >
-                  <SearchIcon className="w-4 h-4" />
-                </Button>
-              </div>
+            <Progress value={getStepProgress()} className="h-2" />
+            
+            {/* Step indicators */}
+            <div className="flex justify-between">
+              {steps.map((step, index) => {
+                const isActive = currentStep === step.id;
+                const isCompleted = currentStep > step.id;
+                const isValid = step.validation();
+                
+                return (
+                  <div key={step.id} className="flex flex-col items-center">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+                      isCompleted && isValid 
+                        ? 'bg-green-500 text-white' 
+                        : isActive 
+                          ? isValid 
+                            ? 'bg-blue-500 text-white' 
+                            : 'bg-amber-500 text-white'
+                          : 'bg-gray-200 text-gray-500'
+                    }`}>
+                      {isCompleted && isValid ? (
+                        <CheckCircleIcon className="w-5 h-5" />
+                      ) : isActive && !isValid ? (
+                        <AlertTriangleIcon className="w-5 h-5" />
+                      ) : (
+                        step.id
+                      )}
+                    </div>
+                    <div className="text-center max-w-24">
+                      <div className={`text-sm font-medium ${isActive ? 'text-blue-600' : 'text-gray-600'}`}>
+                        {step.title}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {step.description}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-          
-          {/* Bảng danh sách người dùng */}
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-10">
-                      <Checkbox 
-                        checked={selectedUsers.length === searchResult.data.length && searchResult.data.length > 0}
-                        onCheckedChange={(checked) => handleSelectAll(!!checked)}
-                      />
-                    </TableHead>
-                    <TableHead>Họ tên</TableHead>
-                    <TableHead>Tên đăng nhập</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Đơn vị</TableHead>
-                    <TableHead>Vai trò hiện tại</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {searchResult.data.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>
-                        <Checkbox 
-                          checked={selectedUsers.includes(user.id)}
-                          onCheckedChange={(checked) => handleSelectUser(user.id, !!checked)}
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">{user.fullName}</TableCell>
-                      <TableCell>{user.username}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.department?.name}</TableCell>
-                      <TableCell>
-                        {user.roles.map(role => role.name).join(', ')}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  
-                  {searchResult.data.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-6 text-gray-500">
-                        Không tìm thấy người dùng nào
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-          
-          {/* Phân trang */}
-          {searchResult.total > 0 && (
-            <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-gray-500">
-                Hiển thị {(searchResult.page - 1) * searchResult.pageSize + 1} đến {Math.min(searchResult.page * searchResult.pageSize, searchResult.total)} của {searchResult.total} người dùng
-              </div>
-              
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious 
-                      onClick={() => searchResult.page > 1 && handlePageChange(searchResult.page - 1)}
-                      className={searchResult.page <= 1 ? 'pointer-events-none opacity-50' : ''}
-                    />
-                  </PaginationItem>
-                  
-                  {Array.from({ length: searchResult.totalPages }, (_, i) => i + 1).map(page => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        isActive={page === searchResult.page}
-                        onClick={() => handlePageChange(page)}
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  
-                  <PaginationItem>
-                    <PaginationNext 
-                      onClick={() => searchResult.page < searchResult.totalPages && handlePageChange(searchResult.page + 1)}
-                      className={searchResult.page >= searchResult.totalPages ? 'pointer-events-none opacity-50' : ''}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
-        </>
-      )}
-      
-      {/* Bước 2: Thiết lập quyền */}
-      {currentStep === 2 && (
-        <>
-          {/* Thông tin đã chọn */}
-          <Card className="mb-6">
-            <CardContent className="py-4">
-              <div>
-                <strong>Đã chọn: {selectedUsers.length} người dùng</strong>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {selectedUsersInfo.users.slice(0, 5).map(user => (
-                    <Badge key={user.id} variant="outline">
-                      {user.fullName}
-                    </Badge>
-                  ))}
-                  {selectedUsersInfo.users.length > 5 && (
-                    <Badge variant="outline">
-                      +{selectedUsersInfo.users.length - 5} người dùng khác
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Tabs defaultValue="roles" className="mb-6">
-            <TabsList className="mb-4">
-              <TabsTrigger value="roles">Vai trò</TabsTrigger>
-              <TabsTrigger value="permissions">Quyền hạn đặc biệt</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="roles">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Phân vai trò</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    {mockRoles.map((role) => (
-                      <div key={role.id} className="flex items-start space-x-2 py-2">
-                        <Checkbox
-                          id={`role-${role.id}`}
-                          checked={selectedRoles.includes(role.id)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedRoles(prev => [...prev, role.id]);
-                            } else {
-                              setSelectedRoles(prev => prev.filter(id => id !== role.id));
-                            }
-                          }}
-                        />
-                        <div className="space-y-1 leading-none">
-                          <label
-                            htmlFor={`role-${role.id}`}
-                            className="font-medium cursor-pointer"
-                          >
-                            {role.name}
-                          </label>
-                          <p className="text-sm text-gray-500">
-                            {role.description}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
-                    <h3 className="font-medium text-blue-800 mb-2">Lưu ý khi phân vai trò</h3>
-                    <ul className="list-disc pl-5 text-sm text-blue-700">
-                      <li>Các vai trò đã chọn sẽ <strong>thay thế</strong> vai trò hiện tại của người dùng</li>
-                      <li>Mỗi người dùng có thể được gán nhiều vai trò</li>
-                      <li>Hãy xem kỹ mô tả vai trò và quyền tương ứng</li>
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="permissions">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Phân quyền đặc biệt</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Nhóm quyền theo group */}
-                  {['TASK', 'USER', 'GROUP', 'ORGANIZATION', 'RESOURCE', 'SETTINGS'].map((group) => {
-                    const groupPermissions = mockPermissions.filter(p => p.group === group);
-                    if (groupPermissions.length === 0) return null;
-                    
-                    const groupName = (() => {
-                      switch (group) {
-                        case 'TASK': return 'Quản lý công việc';
-                        case 'USER': return 'Quản lý người dùng';
-                        case 'GROUP': return 'Quản lý nhóm';
-                        case 'ORGANIZATION': return 'Quản lý tổ chức';
-                        case 'RESOURCE': return 'Quản lý tài nguyên';
-                        case 'SETTINGS': return 'Quản lý cấu hình';
-                        default: return group;
-                      }
-                    })();
-                    
-                    return (
-                      <div key={group} className="border rounded-md p-4">
-                        <h3 className="font-medium mb-3">{groupName}</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {groupPermissions.map((permission) => (
-                            <div key={permission.id} className="flex items-center space-x-2">
-                              <Checkbox
-                                id={`permission-${permission.id}`}
-                                checked={selectedPermissions.includes(permission.id)}
-                                onCheckedChange={(checked) => {
-                                  if (checked) {
-                                    setSelectedPermissions(prev => [...prev, permission.id]);
-                                  } else {
-                                    setSelectedPermissions(prev => prev.filter(id => id !== permission.id));
-                                  }
-                                }}
-                              />
-                              <label
-                                htmlFor={`permission-${permission.id}`}
-                                className="cursor-pointer text-sm"
-                              >
-                                {permission.name}
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                  
-                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-md">
-                    <h3 className="font-medium text-amber-800 mb-2">Lưu ý khi phân quyền đặc biệt</h3>
-                    <ul className="list-disc pl-5 text-sm text-amber-700">
-                      <li>Các quyền đặc biệt sẽ được <strong>thêm vào</strong> quyền từ vai trò</li>
-                      <li>Nếu có xung đột giữa quyền đặc biệt và quyền từ vai trò, quyền đặc biệt sẽ được ưu tiên</li>
-                      <li>Hãy cẩn thận khi gán quyền quản trị hệ thống</li>
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </>
-      )}
-      
-      {/* Nút điều hướng */}
-      <div className="flex justify-end space-x-4 mt-6">
+        </CardContent>
+      </Card>
+
+      {/* Step Content */}
+      {renderStepContent()}
+
+      {/* Navigation Buttons */}
+      <div className="flex justify-between pt-6">
         <Button
           variant="outline"
           onClick={handlePrevStep}
+          disabled={isProcessing}
         >
-          {currentStep === 1 ? 'Quay lại' : 'Quay lại'}
+          {currentStep === 1 ? 'Hủy' : 'Quay lại'}
         </Button>
-        <Button onClick={handleNextStep}>
-          {currentStep === 2 ? 'Hoàn thành' : 'Tiếp theo'}
+
+        <Button
+          onClick={handleNextStep}
+          disabled={isProcessing || !steps[currentStep - 1].validation()}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          {currentStep === steps.length ? 'Thực hiện phân quyền' : 'Tiếp theo'}
         </Button>
       </div>
     </div>

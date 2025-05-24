@@ -8,7 +8,7 @@ interface UserStatusBadgeProps {
   showLabel?: boolean;
 }
 
-const UserStatusBadge: React.FC<UserStatusBadgeProps> = ({ status, showLabel = true }) => {
+export const UserStatusBadge: React.FC<UserStatusBadgeProps> = ({ status, showLabel = true }) => {
   const getStatusConfig = (status: UserStatus) => {
     switch (status) {
       case UserStatus.ACTIVE:
@@ -52,5 +52,3 @@ const UserStatusBadge: React.FC<UserStatusBadgeProps> = ({ status, showLabel = t
     </Badge>
   );
 };
-
-export default UserStatusBadge;

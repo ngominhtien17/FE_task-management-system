@@ -12,7 +12,7 @@ interface UserPermissionSelectorProps {
   conflictingPermissions?: string[];
 }
 
-const UserPermissionSelector: React.FC<UserPermissionSelectorProps> = ({
+export const PermissionSelector: React.FC<UserPermissionSelectorProps> = ({
   permissions,
   selectedPermissionIds,
   onChange,
@@ -126,5 +126,3 @@ const UserPermissionSelector: React.FC<UserPermissionSelectorProps> = ({
     </div>
   );
 };
-
-export default UserPermissionSelector;
