@@ -9,6 +9,7 @@ interface UserRoleSelectorProps {
   selectedRoleIds: string[];
   onChange: (roleIds: string[]) => void;
   readOnly?: boolean;
+  mode?: 'replace' | 'add' | 'remove';
 }
 
 export const RoleSelector: React.FC<UserRoleSelectorProps> = ({

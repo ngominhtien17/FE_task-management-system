@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SearchIcon, FilterIcon, XIcon } from 'lucide-react';
 import { mockDepartments, mockRoles } from '../utils/mockData';
 import { UserStatus } from '../types';
+import { SELECT_VALUES, selectUtils } from '../utils/selectConstants';
 
 interface UserFilterProps {
   onSearch: (query: string) => void;
@@ -29,28 +30,38 @@ export const UserFilter: React.FC<UserFilterProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
-    departmentId: '',
-    roleId: '',
-    status: ''
+    departmentId: SELECT_VALUES.ALL,
+    roleId: SELECT_VALUES.ALL,
+    status: SELECT_VALUES.ALL
   });
-
-  const handleSearch = () => {
-    onSearch(searchQuery);
-  };
 
   const handleFilterChange = (key: string, value: string) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
-    onFilter(newFilters);
+    
+    // Chuyển đổi giá trị để gửi cho component cha
+    const processedFilters = {
+      departmentId: selectUtils.getFilterValue(newFilters.departmentId),
+      roleId: selectUtils.getFilterValue(newFilters.roleId),
+      status: selectUtils.getFilterValue(newFilters.status)
+    };
+    
+    onFilter(processedFilters);
   };
 
   const handleClearFilters = () => {
-    const clearedFilters = { departmentId: '', roleId: '', status: '' };
+    const clearedFilters = { 
+      departmentId: SELECT_VALUES.ALL, 
+      roleId: SELECT_VALUES.ALL, 
+      status: SELECT_VALUES.ALL 
+    };
     setFilters(clearedFilters);
-    onFilter(clearedFilters);
+    onFilter({ departmentId: undefined, roleId: undefined, status: undefined });
   };
 
-  const hasActiveFilters = Object.values(filters).some(value => value !== '');
+  const hasActiveFilters = Object.values(filters).some(value => 
+    !selectUtils.isAllValue(value) && !selectUtils.isEmptyValue(value)
+  );
 
   return (
     <div className="space-y-4">
@@ -63,12 +74,12 @@ export const UserFilter: React.FC<UserFilterProps> = ({
             className="pr-10"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            onKeyDown={(e) => e.key === 'Enter' && onSearch(searchQuery)}
           />
           <Button 
             variant="ghost" 
             className="absolute right-0 top-0 h-full px-3" 
-            onClick={handleSearch}
+            onClick={() => onSearch(searchQuery)}
           >
             <SearchIcon className="w-4 h-4" />
           </Button>
@@ -83,7 +94,9 @@ export const UserFilter: React.FC<UserFilterProps> = ({
           Bộ lọc nâng cao
           {hasActiveFilters && (
             <span className="ml-2 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {Object.values(filters).filter(v => v !== '').length}
+              {Object.values(filters).filter(v => 
+                !selectUtils.isAllValue(v) && !selectUtils.isEmptyValue(v)
+              ).length}
             </span>
           )}
         </Button>
@@ -119,7 +132,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
                     <SelectValue placeholder="Chọn đơn vị" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Tất cả</SelectItem>
+                    <SelectItem value={SELECT_VALUES.ALL}>Tất cả</SelectItem>
                     {mockDepartments.map(dept => (
                       <SelectItem key={dept.id} value={dept.id}>
                         {dept.name}
@@ -139,7 +152,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
                     <SelectValue placeholder="Chọn vai trò" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Tất cả</SelectItem>
+                    <SelectItem value={SELECT_VALUES.ALL}>Tất cả</SelectItem>
                     {mockRoles.map(role => (
                       <SelectItem key={role.id} value={role.id}>
                         {role.name}
@@ -159,7 +172,7 @@ export const UserFilter: React.FC<UserFilterProps> = ({
                     <SelectValue placeholder="Chọn trạng thái" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Tất cả</SelectItem>
+                    <SelectItem value={SELECT_VALUES.ALL}>Tất cả</SelectItem>
                     <SelectItem value={UserStatus.ACTIVE}>Đang hoạt động</SelectItem>
                     <SelectItem value={UserStatus.INACTIVE}>Không hoạt động</SelectItem>
                     <SelectItem value={UserStatus.PENDING}>Chờ kích hoạt</SelectItem>

@@ -541,7 +541,7 @@ const UserCreatePage: React.FC = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="">Không có</SelectItem>
+                            <SelectItem value="all">Không có</SelectItem>
                             {availableManagers.map((user) => (
                               <SelectItem key={user.id} value={user.id}>
                                 <div className="flex flex-col">

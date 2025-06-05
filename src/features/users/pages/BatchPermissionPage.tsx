@@ -1,27 +1,25 @@
 // src/features/users/pages/BatchPermissionPage.tsx - Cải tiến
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 
 import { ArrowLeftIcon, UsersIcon, ShieldIcon, CheckCircleIcon, AlertTriangleIcon } from 'lucide-react';
 
-import { UserFilter } from '../components/UserFilter';
-import { UserPagination } from '../components/UserPagination';
+import { BatchOperationSummary } from '../components/BatchOperationSummary';
 import { UserDataTable } from '../components/UserDataTable';
 import { RoleSelector } from '../components/UserRoleSelector';
 import { PermissionSelector } from '../components/UserPermissionSelector';
-import { BatchOperationSummary } from '../components/BatchOperationSummary';
+import { mockRoles } from '../utils/mockData';
 
 const BatchPermissionPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Multi-step state management
+  // Enhanced state management
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
@@ -29,6 +27,13 @@ const BatchPermissionPage: React.FC = () => {
   const [operationMode, setOperationMode] = useState<'replace' | 'add' | 'remove'>('replace');
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingProgress, setProcessingProgress] = useState(0);
+
+  // Initialize from previous selection
+  useEffect(() => {
+    if (location.state?.selectedUserIds) {
+      setSelectedUsers(location.state.selectedUserIds);
+    }
+  }, [location.state]);
 
   // Enhanced step configuration
   const steps = [
@@ -55,32 +60,17 @@ const BatchPermissionPage: React.FC = () => {
     }
   ];
 
-  // Initialize from previous selection
-  useEffect(() => {
-    if (location.state?.selectedUserIds) {
-      setSelectedUsers(location.state.selectedUserIds);
-    }
-  }, [location.state]);
-
-  // Calculate form progress
-  const getStepProgress = () => {
-    const completedSteps = steps.filter(step => step.validation()).length;
-    return Math.round((completedSteps / steps.length) * 100);
-  };
-
   // Enhanced navigation handlers
   const handleNextStep = async () => {
     const currentStepConfig = steps[currentStep - 1];
     
     if (!currentStepConfig.validation()) {
-      // Show validation error
       return;
     }
 
     if (currentStep < steps.length) {
       setCurrentStep(prev => prev + 1);
     } else {
-      // Execute batch operation
       await executeBatchOperation();
     }
   };
@@ -102,12 +92,10 @@ const BatchPermissionPage: React.FC = () => {
       const totalUsers = selectedUsers.length;
       
       for (let i = 0; i < totalUsers; i++) {
-        // Simulate processing each user
         await new Promise(resolve => setTimeout(resolve, 200));
         setProcessingProgress(Math.round(((i + 1) / totalUsers) * 100));
       }
 
-      // Success handling
       setTimeout(() => {
         navigate('/users', {
           state: {
@@ -128,6 +116,12 @@ const BatchPermissionPage: React.FC = () => {
     }
   };
 
+  // Calculate form progress
+  const getStepProgress = () => {
+    const completedSteps = steps.filter(step => step.validation()).length;
+    return Math.round((completedSteps / steps.length) * 100);
+  };
+
   // Render step content
   const renderStepContent = () => {
     switch (currentStep) {
@@ -142,41 +136,15 @@ const BatchPermissionPage: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <UserFilter 
-                  onSearch={() => {}} 
-                  onFilter={() => {}}
-                  showAdvanced={false}
-                  onToggleAdvanced={() => {}}
+                <UserDataTable 
+                  selectedUsers={selectedUsers}
+                  onSelectionChange={setSelectedUsers}
+                  multiSelect={true}
+                  batchMode={true} // Enable batch mode
+                  showFilters={true}
                 />
-                
-                <div className="mt-4">
-                  <UserDataTable 
-                    selectedUsers={selectedUsers}
-                    onSelectionChange={setSelectedUsers}
-                    multiSelect={true}
-                  />
-                </div>
               </CardContent>
             </Card>
-
-            {selectedUsers.length > 0 && (
-              <Card>
-                <CardContent className="py-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">
-                      Đã chọn {selectedUsers.length} người dùng
-                    </span>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setSelectedUsers([])}
-                    >
-                      Bỏ chọn tất cả
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
         );
 
@@ -201,27 +169,36 @@ const BatchPermissionPage: React.FC = () => {
                       { 
                         mode: 'replace' as const, 
                         title: 'Thay thế', 
-                        description: 'Thay thế toàn bộ quyền hiện tại' 
+                        description: 'Thay thế toàn bộ quyền hiện tại',
+                        icon: '🔄',
+                        color: 'border-blue-200 bg-blue-50'
                       },
                       { 
                         mode: 'add' as const, 
                         title: 'Thêm mới', 
-                        description: 'Thêm quyền vào quyền hiện tại' 
+                        description: 'Thêm quyền vào quyền hiện tại',
+                        icon: '➕',
+                        color: 'border-green-200 bg-green-50'
                       },
                       { 
                         mode: 'remove' as const, 
                         title: 'Gỡ bỏ', 
-                        description: 'Gỡ bỏ quyền khỏi quyền hiện tại' 
+                        description: 'Gỡ bỏ quyền khỏi quyền hiện tại',
+                        icon: '➖',
+                        color: 'border-red-200 bg-red-50'
                       }
-                    ].map(({ mode, title, description }) => (
+                    ].map(({ mode, title, description, icon, color }) => (
                       <Card 
                         key={mode}
                         className={`cursor-pointer transition-all ${
-                          operationMode === mode ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-gray-50'
+                          operationMode === mode 
+                            ? `ring-2 ring-blue-500 ${color}` 
+                            : 'hover:bg-gray-50 border-gray-200'
                         }`}
                         onClick={() => setOperationMode(mode)}
                       >
                         <CardContent className="p-4 text-center">
+                          <div className="text-2xl mb-2">{icon}</div>
                           <div className="font-medium">{title}</div>
                           <div className="text-xs text-gray-600 mt-1">{description}</div>
                         </CardContent>
@@ -234,8 +211,9 @@ const BatchPermissionPage: React.FC = () => {
 
                 {/* Role Selection */}
                 <RoleSelector 
-                  selectedRoles={selectedRoles}
-                  onSelectionChange={setSelectedRoles}
+                  roles={mockRoles}
+                  selectedRoleIds={selectedRoles}
+                  onChange={setSelectedRoles}
                   mode={operationMode}
                 />
 
@@ -322,7 +300,7 @@ const BatchPermissionPage: React.FC = () => {
             
             {/* Step indicators */}
             <div className="flex justify-between">
-              {steps.map((step, index) => {
+              {steps.map((step) => {
                 const isActive = currentStep === step.id;
                 const isCompleted = currentStep > step.id;
                 const isValid = step.validation();

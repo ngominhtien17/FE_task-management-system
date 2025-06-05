@@ -199,7 +199,7 @@ export const UserEditForm: React.FC<UserEditFormProps> = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">Không có</SelectItem>
+                        <SelectItem value="all">Không có</SelectItem>
                         {mockUsers
                           .filter(u => u.id !== user.id)
                           .map((u) => (

@@ -13,24 +13,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
   SearchIcon, 
-  FilterIcon, 
-  SortAscIcon, 
-  SortDescIcon,
-  UsersIcon
+  UsersIcon,
+  CheckCircleIcon
 } from 'lucide-react';
 
 import { UserStatusBadge } from './UserStatusBadge';
-import { mockUsers, mockDepartments } from '../utils/mockData';
+import { mockUsers } from '../utils/mockData';
 
 interface UserDataTableProps {
   selectedUsers: string[];
@@ -39,6 +30,7 @@ interface UserDataTableProps {
   showFilters?: boolean;
   compact?: boolean;
   onUserClick?: (userId: string) => void;
+  batchMode?: boolean; // New prop for batch selection mode
 }
 
 export const UserDataTable: React.FC<UserDataTableProps> = ({
@@ -47,18 +39,17 @@ export const UserDataTable: React.FC<UserDataTableProps> = ({
   multiSelect = true,
   showFilters = true,
   compact = false,
-  onUserClick
+  onUserClick,
+  batchMode = false
 }) => {
-  // Simple UI state - không dùng custom hooks
+  // Enhanced state management for batch mode
   const [searchKeyword, setSearchKeyword] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [sortField, setSortField] = useState('fullName');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = compact ? 5 : 10;
 
-  // Simple filtering logic với mock data
+  // Enhanced filtering logic
   const filteredUsers = mockUsers.filter(user => {
     if (searchKeyword && !user.fullName.toLowerCase().includes(searchKeyword.toLowerCase()) &&
         !user.email.toLowerCase().includes(searchKeyword.toLowerCase())) {
@@ -73,26 +64,12 @@ export const UserDataTable: React.FC<UserDataTableProps> = ({
     return true;
   });
 
-  // Simple sorting
-  const sortedUsers = [...filteredUsers].sort((a, b) => {
-    let aValue = a[sortField as keyof typeof a] || '';
-    let bValue = b[sortField as keyof typeof b] || '';
-    
-    if (sortField === 'department') {
-      aValue = a.department?.name || '';
-      bValue = b.department?.name || '';
-    }
-    
-    const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-    return sortDirection === 'asc' ? comparison : -comparison;
-  });
-
-  // Simple pagination
-  const totalPages = Math.ceil(sortedUsers.length / pageSize);
+  // Enhanced pagination
+  const totalPages = Math.ceil(filteredUsers.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
-  const displayUsers = sortedUsers.slice(startIndex, startIndex + pageSize);
+  const displayUsers = filteredUsers.slice(startIndex, startIndex + pageSize);
 
-  // UI Event handlers - đơn giản, tập trung vào tương tác
+  // Enhanced selection handlers
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       const allUserIds = displayUsers.map(user => user.id);
@@ -115,19 +92,14 @@ export const UserDataTable: React.FC<UserDataTableProps> = ({
     }
   };
 
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
+  // Enhanced row click handler for batch mode
+  const handleRowClick = (userId: string) => {
+    if (batchMode) {
+      const isSelected = selectedUsers.includes(userId);
+      handleSelectUser(userId, !isSelected);
+    } else if (onUserClick) {
+      onUserClick(userId);
     }
-  };
-
-  const clearFilters = () => {
-    setSearchKeyword('');
-    setDepartmentFilter('');
-    setStatusFilter('');
   };
 
   const getInitials = (name: string) => {
@@ -139,23 +111,13 @@ export const UserDataTable: React.FC<UserDataTableProps> = ({
   
   const isIndeterminate = displayUsers.some(user => selectedUsers.includes(user.id)) && !isAllSelected;
 
-  const renderSortIcon = (field: string) => {
-    if (sortField !== field) return null;
-    return sortDirection === 'asc' ? 
-      <SortAscIcon className="w-4 h-4 ml-1" /> : 
-      <SortDescIcon className="w-4 h-4 ml-1" />;
-  };
-
-  const activeFilterCount = [searchKeyword, departmentFilter, statusFilter].filter(Boolean).length;
-
   return (
     <div className="space-y-4">
-      {/* Quick Filters - UI thuần */}
+      {/* Enhanced Search Bar for Batch Mode */}
       {showFilters && (
         <Card>
           <CardContent className="py-4">
-            <div className="flex flex-wrap gap-4 items-center">
-              {/* Search */}
+            <div className="flex items-center gap-4">
               <div className="relative flex-1 max-w-sm">
                 <Input
                   type="text"
@@ -166,71 +128,21 @@ export const UserDataTable: React.FC<UserDataTableProps> = ({
                 />
                 <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               </div>
-
-              {/* Department Filter */}
-              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Đơn vị" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Tất cả đơn vị</SelectItem>
-                  {mockDepartments.map(dept => (
-                    <SelectItem key={dept.id} value={dept.id}>
-                      {dept.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {/* Status Filter */}
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Trạng thái" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Tất cả</SelectItem>
-                  <SelectItem value="ACTIVE">Hoạt động</SelectItem>
-                  <SelectItem value="INACTIVE">Không hoạt động</SelectItem>
-                  <SelectItem value="PENDING">Chờ kích hoạt</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Clear Filters */}
-              {activeFilterCount > 0 && (
-                <Button variant="outline" size="sm" onClick={clearFilters}>
-                  <FilterIcon className="w-4 h-4 mr-2" />
-                  Xóa bộ lọc ({activeFilterCount})
-                </Button>
+              
+              {batchMode && selectedUsers.length > 0 && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg border">
+                  <CheckCircleIcon className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-700">
+                    Đã chọn {selectedUsers.length} người dùng
+                  </span>
+                </div>
               )}
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Selection Summary */}
-      {selectedUsers.length > 0 && (
-        <Card>
-          <CardContent className="py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <UsersIcon className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium">
-                  Đã chọn {selectedUsers.length} người dùng
-                </span>
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => onSelectionChange([])}
-              >
-                Bỏ chọn tất cả
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Main Table */}
+      {/* Enhanced Main Table */}
       <Card>
         <CardContent className="p-0">
           <div className="overflow-auto max-h-96">
@@ -248,96 +160,84 @@ export const UserDataTable: React.FC<UserDataTableProps> = ({
                       />
                     </TableHead>
                   )}
-                  <TableHead 
-                    className="cursor-pointer hover:bg-gray-50"
-                    onClick={() => handleSort('fullName')}
-                  >
-                    <div className="flex items-center">
-                      Người dùng
-                      {renderSortIcon('fullName')}
-                    </div>
-                  </TableHead>
-                  <TableHead 
-                    className="cursor-pointer hover:bg-gray-50"
-                    onClick={() => handleSort('email')}
-                  >
-                    <div className="flex items-center">
-                      Email
-                      {renderSortIcon('email')}
-                    </div>
-                  </TableHead>
-                  <TableHead 
-                    className="cursor-pointer hover:bg-gray-50"
-                    onClick={() => handleSort('department')}
-                  >
-                    <div className="flex items-center">
-                      Đơn vị
-                      {renderSortIcon('department')}
-                    </div>
-                  </TableHead>
+                  <TableHead>Người dùng</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Đơn vị</TableHead>
                   <TableHead>Vai trò</TableHead>
                   <TableHead>Trạng thái</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {displayUsers.map((user) => (
-                  <TableRow 
-                    key={user.id}
-                    className={`
-                      ${selectedUsers.includes(user.id) ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'}
-                      ${onUserClick ? 'cursor-pointer' : ''}
-                      transition-colors
-                    `}
-                    onClick={() => onUserClick?.(user.id)}
-                  >
-                    {multiSelect && (
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <Checkbox 
-                          checked={selectedUsers.includes(user.id)}
-                          onCheckedChange={(checked) => handleSelectUser(user.id, !!checked)}
-                        />
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={user.avatar} />
-                          <AvatarFallback className="text-xs">
-                            {getInitials(user.fullName)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium">{user.fullName}</div>
-                          <div className="text-sm text-gray-500">@{user.username}</div>
+                {displayUsers.map((user) => {
+                  const isSelected = selectedUsers.includes(user.id);
+                  
+                  return (
+                    <TableRow 
+                      key={user.id}
+                      className={`
+                        ${isSelected ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'}
+                        ${batchMode ? 'cursor-pointer' : ''}
+                        transition-colors duration-200
+                      `}
+                      onClick={() => handleRowClick(user.id)}
+                    >
+                      {multiSelect && (
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center">
+                            <Checkbox 
+                              checked={isSelected}
+                              onCheckedChange={(checked) => handleSelectUser(user.id, !!checked)}
+                            />
+                            {/* Enhanced Visual Indicator */}
+                            {isSelected && (
+                              <CheckCircleIcon className="w-4 h-4 text-blue-600 ml-2" />
+                            )}
+                          </div>
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={user.avatar} />
+                            <AvatarFallback className="text-xs">
+                              {getInitials(user.fullName)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className={`font-medium ${isSelected ? 'text-blue-900' : ''}`}>
+                              {user.fullName}
+                            </div>
+                            <div className="text-sm text-gray-500">@{user.username}</div>
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm">{user.email}</TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <div className="font-medium">{user.department?.name}</div>
-                        <div className="text-gray-500">{user.position?.name}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {user.roles.slice(0, 2).map(role => (
-                          <Badge key={role.id} variant="outline" className="text-xs">
-                            {role.name}
-                          </Badge>
-                        ))}
-                        {user.roles.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{user.roles.length - 2}
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <UserStatusBadge status={user.status} />
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+                      <TableCell className="text-sm">{user.email}</TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          <div className="font-medium">{user.department?.name}</div>
+                          <div className="text-gray-500">{user.position?.name}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {user.roles.slice(0, 2).map(role => (
+                            <Badge key={role.id} variant="outline" className="text-xs">
+                              {role.name}
+                            </Badge>
+                          ))}
+                          {user.roles.length > 2 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{user.roles.length - 2}
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <UserStatusBadge status={user.status} />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
                 
                 {displayUsers.length === 0 && (
                   <TableRow>
@@ -348,11 +248,6 @@ export const UserDataTable: React.FC<UserDataTableProps> = ({
                       <div className="flex flex-col items-center gap-2">
                         <UsersIcon className="h-8 w-8 text-gray-400" />
                         <span>Không tìm thấy người dùng nào</span>
-                        {activeFilterCount > 0 && (
-                          <Button variant="outline" size="sm" onClick={clearFilters}>
-                            Xóa bộ lọc
-                          </Button>
-                        )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -360,39 +255,6 @@ export const UserDataTable: React.FC<UserDataTableProps> = ({
               </TableBody>
             </Table>
           </div>
-          
-          {/* Simple Pagination */}
-          {sortedUsers.length > pageSize && (
-            <div className="flex items-center justify-between p-4 border-t">
-              <div className="text-sm text-gray-500">
-                Hiển thị {startIndex + 1} đến {Math.min(startIndex + pageSize, sortedUsers.length)} của {sortedUsers.length} người dùng
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                >
-                  Trước
-                </Button>
-                
-                <span className="text-sm px-3">
-                  Trang {currentPage} / {totalPages}
-                </span>
-                
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  Sau
-                </Button>
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>
