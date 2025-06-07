@@ -132,3 +132,5 @@ export type DeactivationReason = {
   deactivatedBy: string;
   deactivatedAt: string;
 };
+
+export type { UserEntity, CreateUserRequest, UpdateUserRequest, UserState } from './userType';

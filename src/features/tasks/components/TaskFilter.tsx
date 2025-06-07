@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Search, Filter, SortAsc } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/common/components/ui/input";
+import { Button } from "@/common/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -11,7 +11,7 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuSeparator,
   DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
+} from "@/common/components/ui/dropdown-menu";
 
 interface TaskFilterProps {
   onSearch: (query: string) => void;

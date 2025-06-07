@@ -1,6 +1,6 @@
 // src/layouts/components/MainHeader.tsx
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/common/components/ui/button";
+import { Input } from "@/common/components/ui/input";
 import { 
   Bell, 
   Menu, 
@@ -16,24 +16,33 @@ import {
   DropdownMenuItem, 
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from "@/common/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/features/auth";
 
 interface MainHeaderProps {
   toggleSidebar: () => void;
   isSidebarCollapsed: boolean;
-  onLogout: () => void;
-  user: User | null;
 }
 
 export function MainHeader({ 
   toggleSidebar, 
   isSidebarCollapsed, 
-  onLogout,
-  user
 }: MainHeaderProps) {
   const navigate = useNavigate();
+  const { user, logout, loading } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/auth/login");
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Force navigation even if logout API fails
+      navigate("/auth/login");
+    }
+  };
 
   const getInitials = (name: string = "") => {
     if (!name) return 'U';
@@ -44,6 +53,8 @@ export function MainHeader({
       .toUpperCase()
       .substring(0, 2);
   };
+
+  const isLoggingOut = loading === 'pending';
 
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white shadow-sm z-40 flex items-center px-4">
@@ -95,7 +106,7 @@ export function MainHeader({
                   alt={user?.fullName || "User"} 
                 />
                 <AvatarFallback className="bg-blue-600 text-white font-medium">
-                  {user ? getInitials(user.fullName) : "NV"}
+                  {user ? getInitials(user.fullName) : "U"}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -104,7 +115,7 @@ export function MainHeader({
             <div className="flex flex-col space-y-1 p-3 bg-blue-50 rounded-t-md">
               <p className="text-sm font-medium text-gray-800">{user?.fullName || "Người dùng"}</p>
               <p className="text-xs text-gray-500">{user?.email || ""}</p>
-              <p className="text-xs text-blue-600 font-medium mt-1">{user?.role || ""}</p>
+              <p className="text-xs text-blue-600 font-medium mt-1">{user?.status || ""}</p>
             </div>
             <DropdownMenuSeparator />
             <div className="p-1">
@@ -117,10 +128,11 @@ export function MainHeader({
               </DropdownMenuItem>
               <DropdownMenuItem 
                 className="cursor-pointer text-red-500 hover:bg-red-50 hover:text-red-600 p-2 rounded-md mt-1"
-                onClick={onLogout}
+                onClick={handleLogout}
+                disabled={isLoggingOut}
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Đăng xuất</span>
+                <span>{isLoggingOut ? "Đang đăng xuất..." : "Đăng xuất"}</span>
               </DropdownMenuItem>
             </div>
           </DropdownMenuContent>

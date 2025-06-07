@@ -1,7 +1,7 @@
 // src/features/task/components/TaskViewToggle.tsx
 
 import { LayoutList, LayoutGrid } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@/common/components/ui/toggle-group";
 
 interface TaskViewToggleProps {
   view: "table" | "kanban";

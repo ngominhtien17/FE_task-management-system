@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/common/components/ui/scroll-area";
+import { Sheet, SheetContent } from "@/common/components/ui/sheet";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/common/components/ui/tooltip";
+import { cn } from "@/common/utils/utils";
 import {
   Home, Users, FolderTree, CheckSquare, Calendar, FileText, Kanban, List,
   PlusCircle, Users2, FolderPlus, HelpCircle, Layers, BarChart3, Settings, User,

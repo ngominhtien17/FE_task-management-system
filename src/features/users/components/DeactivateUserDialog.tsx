@@ -7,8 +7,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/common/components/ui/dialog';
+import { Button } from '@/common/components/ui/button';
 import type { User } from '../types';
 
 interface DeactivateUserDialogProps {

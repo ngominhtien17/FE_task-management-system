@@ -2,21 +2,21 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { X, Calendar, FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@/common/components/ui/button";
+import { Input } from "@/common/components/ui/input";
+import { Textarea } from "@/common/components/ui/textarea";
+import { Label } from "@/common/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/common/components/ui/radio-group";
+import { Separator } from "@/common/components/ui/separator";
 import { 
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+} from "@/common/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/common/components/ui/calendar";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/utils/utils";
 import { FileUploadArea } from "../components/FileUploadArea";
 import { TaskStatusBadge } from "../components/TaskStatusBadge";
 import { TaskPriorityBadge } from "../components/TaskPriorityBadge";

@@ -2,19 +2,19 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { X, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@/common/components/ui/button";
+import { Textarea } from "@/common/components/ui/textarea";
+import { Label } from "@/common/components/ui/label";
+import { Separator } from "@/common/components/ui/separator";
 import { 
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+} from "@/common/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/common/components/ui/calendar";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/utils/utils";
 import { TaskStatusBadge } from "../components/TaskStatusBadge";
 import { TaskPriorityBadge } from "../components/TaskPriorityBadge";
 import type { Task } from "../types";

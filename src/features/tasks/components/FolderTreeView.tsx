@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FolderIcon, ChevronDown, ChevronRight, Search, Plus } from 'lucide-react';
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/utils/utils";
 import type { FolderItem, FolderTreeViewProps, TreeItemProps } from '../types/folder.types';
 
 // Component hiển thị một mục thư mục cụ thể

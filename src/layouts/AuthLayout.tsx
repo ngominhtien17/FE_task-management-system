@@ -1,10 +1,10 @@
 // src/layouts/auth-layout.tsx
 import React, { useRef } from "react";
 import { Outlet } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { LottieAnimation } from "@/components/ui/LottieAnimation";
+import { cn } from "@/common/utils/utils";
+import { LottieAnimation } from "@/common/components/ui/LottieAnimation";
 import animationData from "../assets/animations/login-animation.json";
-import WavesParticlesBackground from "../components/ui/wavesParticlesBackground"
+import WavesParticlesBackground from "../common/components/ui/wavesParticlesBackground"
 
 type AuthLayoutProps = {
   className?: string;

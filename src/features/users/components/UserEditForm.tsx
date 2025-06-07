@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
+import { Button } from '@/common/components/ui/button';
 import { 
   Form, 
   FormControl, 
@@ -12,15 +12,15 @@ import {
   FormItem, 
   FormLabel, 
   FormMessage 
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from '@/common/components/ui/form';
+import { Input } from '@/common/components/ui/input';
 import { 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from '@/components/ui/select';
+} from '@/common/components/ui/select';
 import { SaveIcon, XIcon } from 'lucide-react';
 import type { User } from '../types';
 import { mockDepartments, mockPositions, mockUsers } from '../utils/mockData';

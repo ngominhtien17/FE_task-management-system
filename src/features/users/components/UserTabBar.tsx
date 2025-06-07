@@ -1,6 +1,6 @@
 // src/features/users/components/UserTabBar.tsx
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/common/components/ui/button';
 
 interface UserTabBarProps {
   currentTab: string;

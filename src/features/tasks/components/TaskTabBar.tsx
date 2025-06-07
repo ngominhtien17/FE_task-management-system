@@ -1,7 +1,7 @@
 // src/features/task/components/TaskTabBar.tsx
 
-import { Button } from "@/components/ui/button";
-import { TabsList, TabsTrigger, Tabs } from "@/components/ui/tabs";
+import { Button } from "@/common/components/ui/button";
+import { TabsList, TabsTrigger, Tabs } from "@/common/components/ui/tabs";
 
 interface TaskTabProps {
   currentTab: string;

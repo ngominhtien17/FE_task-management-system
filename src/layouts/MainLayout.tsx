@@ -1,35 +1,19 @@
 // src/layouts/MainLayout.tsx
 import { useState, useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { MainHeader } from "./components/MainHeader";
 import { MainSidebar } from "./components/MainSidebar";
-import { AppBreadcrumb } from "@/components/breadcrumb";
-import { BreadcrumbProvider } from "@/components/breadcrumb";
+import { AppBreadcrumb } from "@/common/components/breadcrumb";
+import { BreadcrumbProvider } from "@/common/components/breadcrumb";
 
 interface MainLayoutProps {
   children?: React.ReactNode;
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
-  const navigate = useNavigate();
-  
   // UI state variables
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-
-  // Mock user data for UI display
-  const mockUser = {
-    id: "1",
-    fullName: "Nguyễn Văn A",
-    email: "nguyenvana@example.com",
-    role: "Admin",
-    avatar: "",
-    customSettings: {
-      profileImage: "",
-      theme: "light",
-      language: "vi",
-    }
-  };
 
   // Handle responsive layout
   useEffect(() => {
@@ -54,20 +38,12 @@ export function MainLayout({ children }: MainLayoutProps) {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
-  const handleLogout = () => {
-    // Giả lập quá trình đăng xuất
-    console.log("Đăng xuất thành công");
-    navigate("/auth/login");
-  };
-
   return (
     <BreadcrumbProvider>
       <div className="min-h-screen bg-background">
         <MainHeader
           toggleSidebar={toggleSidebar}
           isSidebarCollapsed={isSidebarCollapsed}
-          onLogout={handleLogout}
-          user={mockUser}
         />
 
         <MainSidebar

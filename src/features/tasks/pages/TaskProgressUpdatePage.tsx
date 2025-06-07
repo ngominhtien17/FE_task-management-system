@@ -2,11 +2,11 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { X, FileText, Upload } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@/common/components/ui/button";
+import { Input } from "@/common/components/ui/input";
+import { Textarea } from "@/common/components/ui/textarea";
+import { Label } from "@/common/components/ui/label";
+import { Separator } from "@/common/components/ui/separator";
 import { ProgressSlider } from "../components/ProgressSlider";
 import { FileUploadArea } from "../components/FileUploadArea";
 import { TaskStatusBadge } from "../components/TaskStatusBadge";

@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, ArrowLeft, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@/common/components/ui/button";
+import { Separator } from "@/common/components/ui/separator";
 import { TaskFilter } from "../components/TaskFilter";
 import { TaskPriorityBadge } from "../components/TaskPriorityBadge";
 import type { Task } from "../types";

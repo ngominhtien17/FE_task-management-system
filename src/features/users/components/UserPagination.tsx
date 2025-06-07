@@ -8,14 +8,14 @@ import {
   PaginationNext, 
   PaginationPrevious,
   PaginationEllipsis
-} from '@/components/ui/pagination';
+} from '@/common/components/ui/pagination';
 import { 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from '@/components/ui/select';
+} from '@/common/components/ui/select';
 
 interface UserPaginationProps {
   currentPage: number;

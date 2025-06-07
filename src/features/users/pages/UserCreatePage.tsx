@@ -1,7 +1,7 @@
 // src/features/users/pages/UserCreatePage.tsx - Kiến trúc cải tiến
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { 
   Form, 
   FormControl, 
@@ -10,20 +10,20 @@ import {
   FormItem, 
   FormLabel, 
   FormMessage 
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+} from '@/common/components/ui/form';
+import { Input } from '@/common/components/ui/input';
+import { Button } from '@/common/components/ui/button';
 import { 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+} from '@/common/components/ui/select';
+import { Checkbox } from '@/common/components/ui/checkbox';
+import { Progress } from '@/common/components/ui/progress';
+import { Separator } from '@/common/components/ui/separator';
+import { Alert, AlertDescription, AlertTitle } from '@/common/components/ui/alert';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';

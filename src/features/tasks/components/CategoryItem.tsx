@@ -1,7 +1,7 @@
 // src/features/tasks/components/CategoryItem.tsx
 import { useState } from "react";
 import { ChevronRight, FolderIcon, Edit, Trash } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/utils/utils";
 
 interface CategoryItemProps {
   id: string;

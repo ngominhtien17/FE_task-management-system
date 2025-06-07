@@ -1,9 +1,9 @@
 // src/features/users/components/UserPermissionSelector.tsx
 import React, { useState } from 'react';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Checkbox } from '@/common/components/ui/checkbox';
+import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
+import { Badge } from '@/common/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/common/components/ui/alert';
 import { ChevronDownIcon, ChevronRightIcon, KeyIcon, InfoIcon } from 'lucide-react';
 import type { Permission } from '../types';
 import { mockPermissions } from '../utils/mockData';

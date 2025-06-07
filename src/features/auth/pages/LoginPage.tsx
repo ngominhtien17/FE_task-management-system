@@ -1,28 +1,40 @@
 // src/features/auth/pages/LoginPage.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, KeyRound, LockIcon, AlertCircle, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/common/components/ui/button";
+import { Input } from "@/common/components/ui/input";
+import { Label } from "@/common/components/ui/label";
+import { Checkbox } from "@/common/components/ui/checkbox";
+import { useAuth } from "../hooks";
+import type { LoginRequest } from "../types";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { login, loading, error, isAuthenticated, clearError } = useAuth();
   
-  // UI state only
+  // Form state
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
+  const [formData, setFormData] = useState<LoginRequest & { rememberMe: boolean }>({
+    username: "",
     password: "",
     rememberMe: false,
   });
-  
-  // Giả lập loading và error để demo UI
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // Handler functions for UI interactions
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Clear error when form data changes
+  useEffect(() => {
+    if (error) {
+      clearError();
+    }
+  }, [formData, clearError, error]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -35,22 +47,27 @@ export function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // Giả lập quá trình đăng nhập
-    setIsLoading(true);
-    setError(null);
-    
-    // Giả lập thời gian xử lý
-    setTimeout(() => {
-      if (formData.email === "demo@example.com" && formData.password === "password") {
-        // Giả lập đăng nhập thành công
-        navigate("/dashboard");
-      } else {
-        // Giả lập đăng nhập thất bại
-        setError("Email hoặc mật khẩu không chính xác");
+    if (!formData.username.trim() || !formData.password.trim()) {
+      return;
+    }
+
+    try {
+      const result = await login({
+        username: formData.username.trim(),
+        password: formData.password,
+      });
+      
+      if (result.meta.requestStatus === 'fulfilled') {
+        // Login successful, navigation will be handled by useEffect
+        console.log('Login successful');
       }
-      setIsLoading(false);
-    }, 1500);
+    } catch (err) {
+      // Error is handled by Redux state
+      console.error('Login failed:', err);
+    }
   };
+
+  const isLoading = loading === 'pending';
 
   return (
     <div className="flex flex-col items-center w-full">
@@ -78,23 +95,24 @@ export function LoginPage() {
       
       {/* Form */}
       <form onSubmit={handleSubmit} className="w-full space-y-5">
-        {/* Email field */}
+        {/* Username field */}
         <div className="space-y-1.5">
           <Label 
-            htmlFor="email" 
+            htmlFor="username" 
             className="text-sm font-medium text-gray-700"
           >
-            Email
+            Tên đăng nhập
           </Label>
           <div className="relative">
             <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Nhập địa chỉ email"
+              id="username"
+              name="username"
+              type="text"
+              placeholder="Nhập tên đăng nhập"
               className="h-12 pl-10 pr-4 text-[15px] border-gray-200 rounded-lg bg-gray-50 focus:bg-white"
-              value={formData.email}
+              value={formData.username}
               onChange={handleChange}
+              disabled={isLoading}
               required
             />
             <User 
@@ -121,6 +139,7 @@ export function LoginPage() {
               className="h-12 pl-10 pr-10 text-[15px] border-gray-200 rounded-lg bg-gray-50 focus:bg-white"
               value={formData.password}
               onChange={handleChange}
+              disabled={isLoading}
               required
             />
             <LockIcon 
@@ -129,8 +148,9 @@ export function LoginPage() {
             />
             <button
               type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors disabled:cursor-not-allowed"
               onClick={() => setShowPassword(!showPassword)}
+              disabled={isLoading}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -145,6 +165,7 @@ export function LoginPage() {
               checked={formData.rememberMe}
               onCheckedChange={handleCheckboxChange}
               className="h-4 w-4 rounded data-[state=checked]:bg-blue-600 border-gray-300"
+              disabled={isLoading}
             />
             <Label 
               htmlFor="rememberMe" 
@@ -155,8 +176,9 @@ export function LoginPage() {
           </div>
           <button
             type="button"
-            className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium"
+            className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium disabled:cursor-not-allowed disabled:opacity-50"
             onClick={() => navigate("/auth/forgot-password")}
+            disabled={isLoading}
           >
             Quên mật khẩu?
           </button>
@@ -173,8 +195,8 @@ export function LoginPage() {
         {/* Login button */}
         <Button 
           type="submit"
-          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium text-base transition-all rounded-lg"
-          disabled={isLoading}
+          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium text-base transition-all rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isLoading || !formData.username.trim() || !formData.password.trim()}
         >
           {isLoading ? (
             <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -194,7 +216,8 @@ export function LoginPage() {
         <Button 
           type="button"
           variant="outline"
-          className="w-full h-12 border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-lg flex items-center justify-center gap-3 transition-all"
+          className="w-full h-12 border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-lg flex items-center justify-center gap-3 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={isLoading}
         >
           <KeyRound size={18} className="text-blue-600" />
           Đăng nhập SSO

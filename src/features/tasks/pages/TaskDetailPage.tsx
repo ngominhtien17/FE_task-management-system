@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { X, Paperclip, Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { Button } from "@/common/components/ui/button";
+import { Textarea } from "@/common/components/ui/textarea";
+import { Separator } from "@/common/components/ui/separator";
+import { Progress } from "@/common/components/ui/progress";
+import { ScrollArea } from "@/common/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/common/components/ui/dialog";
 
 import { TaskStatusBadge } from "../components/TaskStatusBadge";
 import { TaskPriorityBadge } from "../components/TaskPriorityBadge";

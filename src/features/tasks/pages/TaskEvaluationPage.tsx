@@ -2,15 +2,15 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { X, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "@/common/components/ui/button";
+import { Textarea } from "@/common/components/ui/textarea";
+import { Label } from "@/common/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/common/components/ui/radio-group";
+import { Separator } from "@/common/components/ui/separator";
 import { TaskStatusBadge } from "../components/TaskStatusBadge";
 import { TaskPriorityBadge } from "../components/TaskPriorityBadge";
 import type { Task } from "../types";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/common/components/ui/alert";
 // Mock task for demonstration
 const MOCK_TASK: Task = {
   id: "2",

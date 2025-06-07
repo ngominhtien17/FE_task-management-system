@@ -1,20 +1,20 @@
 // src/pages/dashboard/index.tsx
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/common/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
+import { Badge } from "@/common/components/ui/badge";
+import { Progress } from "@/common/components/ui/progress";
+import { Button } from "@/common/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/common/components/ui/avatar";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
   ResponsiveContainer, LineChart, Line, AreaChart, Area
 } from "recharts";
-import { Calendar } from "@/components/ui/calendar";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
+import { Calendar } from "@/common/components/ui/calendar";
+import { Checkbox } from "@/common/components/ui/checkbox";
+import { ScrollArea } from "@/common/components/ui/scroll-area";
+import { Separator } from "@/common/components/ui/separator";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 

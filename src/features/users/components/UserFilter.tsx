@@ -1,15 +1,15 @@
 // src/features/users/components/UserFilter.tsx
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/common/components/ui/button';
+import { Input } from '@/common/components/ui/input';
 import { 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+} from '@/common/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { SearchIcon, FilterIcon, XIcon } from 'lucide-react';
 import { mockDepartments, mockRoles } from '../utils/mockData';
 import { UserStatus } from '../types';

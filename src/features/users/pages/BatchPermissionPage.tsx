@@ -1,11 +1,11 @@
 // src/features/users/pages/BatchPermissionPage.tsx - Cải tiến
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
+import { Button } from '@/common/components/ui/button';
+import { Progress } from '@/common/components/ui/progress';
+import { Alert, AlertDescription, AlertTitle } from '@/common/components/ui/alert';
+import { Separator } from '@/common/components/ui/separator';
 
 import { ArrowLeftIcon, UsersIcon, ShieldIcon, CheckCircleIcon, AlertTriangleIcon } from 'lucide-react';
 

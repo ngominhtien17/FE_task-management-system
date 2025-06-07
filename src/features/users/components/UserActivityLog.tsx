@@ -3,18 +3,18 @@
 // ================================================================
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
+import { Button } from '@/common/components/ui/button';
+import { Badge } from '@/common/components/ui/badge';
 import { 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
   SelectValue 
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
+} from '@/common/components/ui/select';
+import { Input } from '@/common/components/ui/input';
+import { Separator } from '@/common/components/ui/separator';
 import { 
   ClockIcon, 
   SearchIcon, 

@@ -1,7 +1,7 @@
 // src/routes/components/RouteComponents.tsx
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-
+import { useAuth } from '@/features/auth';
 
 /**
  * Thành phần bảo vệ tuyến đường yêu cầu xác thực
@@ -12,26 +12,47 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  // const { isAuthenticated, isLoading } = useAuth();
-  // giả lập đăng nhập đã xác thực
-  const isAuthenticated = true;
-  const isLoading = false;
+  const { isAuthenticated, loading, checkAuth } = useAuth();
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Hiển thị trạng thái tải trong quá trình kiểm tra xác thực
-  if (isLoading) {
+  useEffect(() => {
+    const initAuth = async () => {
+      const token = localStorage.getItem('accessToken');
+      
+      if (token && !isAuthenticated && loading === 'idle') {
+        console.log('🔄 ProtectedRoute: Checking auth with existing token');
+        try {
+          await checkAuth();
+        } catch (error) {
+          console.error('🔴 ProtectedRoute: Auth check failed:', error);
+        }
+      }
+      
+      setIsInitialized(true);
+    };
+
+    initAuth();
+  }, [checkAuth, isAuthenticated, loading]);
+
+  // Show loading nếu chưa initialized hoặc đang check auth
+  if (!isInitialized || loading === 'pending') {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang kiểm tra xác thực...</p>
+        </div>
       </div>
     );
   }
 
   // Chuyển hướng đến trang đăng nhập nếu chưa xác thực
   if (!isAuthenticated) {
+    console.log('🔴 ProtectedRoute: Not authenticated, redirecting to login');
     return <Navigate to="/auth/login" replace />;
   }
 
-  // Hiển thị nội dung được bảo vệ
+  console.log('✅ ProtectedRoute: Authenticated, rendering protected content');
   return <>{children}</>;
 };
 

@@ -1,6 +1,6 @@
 // src/features/tasks/components/ProgressSlider.tsx
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/common/utils/utils";
 
 interface ProgressSliderProps {
   value: number;

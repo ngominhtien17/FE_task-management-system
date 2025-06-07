@@ -1,6 +1,6 @@
 // src/features/users/components/UserAvatar.tsx
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
 import type { User } from '../types';
 
 interface UserAvatarProps {

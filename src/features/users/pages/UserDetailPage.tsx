@@ -1,13 +1,13 @@
 // src/features/users/pages/UserDetailPage.tsx - Kiến trúc cải tiến
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
+import { Button } from '@/common/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/common/components/ui/tabs';
+import { Badge } from '@/common/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/common/components/ui/avatar';
+import { Separator } from '@/common/components/ui/separator';
+import { Alert, AlertDescription, AlertTitle } from '@/common/components/ui/alert';
 
 import { ArrowLeftIcon, EditIcon, ShieldIcon, HistoryIcon, SettingsIcon } from 'lucide-react';
 

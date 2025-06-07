@@ -1,6 +1,6 @@
 // src/features/tasks/components/DemoDataInfo.tsx
 import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/common/components/ui/alert";
 
 interface DemoDataInfoProps {
   currentRole?: 'admin' | 'manager' | 'assignee';

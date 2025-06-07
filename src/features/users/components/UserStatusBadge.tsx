@@ -1,6 +1,6 @@
 // src/features/users/components/UserStatusBadge.tsx
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/common/components/ui/badge';
 import { UserStatus } from '../types';
 
 interface UserStatusBadgeProps {

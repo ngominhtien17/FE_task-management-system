@@ -5,11 +5,11 @@ import {
   ArrowRight, CheckCircle2, ClipboardList, Clock, 
   AlertTriangle, Info, Link as LinkIcon
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/common/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/common/components/ui/card";
+import { Separator } from "@/common/components/ui/separator";
+import { Badge } from "@/common/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/common/components/ui/tabs";
 
 export function TaskWorkflowGuidePage() {
   const navigate = useNavigate();

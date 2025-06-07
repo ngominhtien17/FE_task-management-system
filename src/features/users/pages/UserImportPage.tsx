@@ -6,8 +6,8 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+} from '@/common/components/ui/card';
+import { Button } from '@/common/components/ui/button';
 import { 
   Table, 
   TableBody, 
@@ -15,10 +15,10 @@ import {
   TableHead, 
   TableHeader, 
   TableRow 
-} from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+} from '@/common/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/common/components/ui/tabs';
+import { Badge } from '@/common/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/common/components/ui/alert';
 import { ArrowLeftIcon, FileIcon, UploadIcon, AlertCircleIcon, CheckCircleIcon, XCircleIcon } from 'lucide-react';
 
 import { mockDepartments } from '../utils/mockData';

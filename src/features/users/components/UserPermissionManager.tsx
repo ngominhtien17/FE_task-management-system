@@ -2,13 +2,13 @@
 
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
+import { Button } from '@/common/components/ui/button';
+import { Checkbox } from '@/common/components/ui/checkbox';
+import { Badge } from '@/common/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/common/components/ui/tabs';
+import { Alert, AlertDescription, AlertTitle } from '@/common/components/ui/alert';
+import { Separator } from '@/common/components/ui/separator';
 import { ShieldIcon, AlertTriangleIcon, InfoIcon } from 'lucide-react';
 import type { User } from '../types';
 import { mockRoles, mockPermissions } from '../utils/mockData';

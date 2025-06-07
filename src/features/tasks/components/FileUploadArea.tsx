@@ -1,7 +1,7 @@
 // src/features/tasks/components/FileUploadArea.tsx
 import { useState, useRef } from "react";
 import { X, Upload } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/common/components/ui/button";
 
 interface FileUploadAreaProps {
   onFilesSelected: (files: File[]) => void;

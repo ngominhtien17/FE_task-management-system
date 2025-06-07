@@ -1,6 +1,6 @@
 // src/features/users/components/UserRoleSelector.tsx
 import React from 'react';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@/common/components/ui/checkbox';
 import { ClockIcon } from 'lucide-react';
 import type { Role } from '../types';
 
